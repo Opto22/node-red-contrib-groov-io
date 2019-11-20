@@ -51,7 +51,7 @@
       "typescript-formatter": "7.2.2",
       "node-red": "0.19.5",
       "swagger-typescript-codegen": "1.9.3",
-      "js-yaml": "3.12.1"
+      "js-yaml": "3.13.1"
     },
     "keywords": [ "node-red", "Opto 22", "PAC", "groov", "epic", "I/O", "industrial"],
     "node-red"     : {
