@@ -1,0 +1,1567 @@
+swagger: "2.0"
+info:
+  description: |
+    _groov_ Manage REST API
+    ==================================================================
+
+    The _groov_ Manage REST API provides secure access to the I/O on the rack.
+    
+    The REST API allows clients to store and retrieve files for use by Node-RED,
+    the Control Engine, _groov_ Manage, and other REST clients.
+
+    Authentication
+    ------------------------------------------------------------------
+
+    Each request is authenticated by means of an API key.
+
+    API keys are assigned to each user within _groov_ Manage.
+
+    Example Request
+    ------------------------------------------------------------------
+
+    Using *curl* to request the list of modules plugged into the rack at hostname *opto-01-02-03*
+    with an API Key of *TZC2TAPxs2jyqU9xRKEoSRNVEL3qfAsw*:
+
+        curl -k -H apiKey:TZC2TAPxs2jyqU9xRKEoSRNVEL3qfAsw 
+          https://opto-01-02-03/manage/api/v1/io/local/modules/type
+
+    Example Response:
+
+        {
+          "types": [
+            {
+              "index": 0,
+              "type": "0xA0000003",
+              "name": "GRV-OVMALC-8"
+            },
+            {
+              "index": 1,
+              "type": "0x60000002",
+              "name": "GRV-IV-24"
+            },
+            {
+              "index": 2,
+              "type": "0x00000000",
+              "name": ""
+            },
+            ...etc...
+          ]
+        }
+  version: "1.3.0"
+  title: groov Manage
+  contact:
+    name: developer@opto22.com
+  license:
+    name: Apache 2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
+basePath: /manage
+schemes:
+  - https
+securityDefinitions:
+  apiKey:
+    type: apiKey
+    name: apiKey
+    in: header  
+parameters:
+  deviceParam:
+    in: path
+    name: device
+    description: The name of the device. Use "local" for the built-in rack of I/O.
+    required: true
+    type: string
+  moduleIndexParam:
+    in: path
+    name: moduleIndex
+    description: The index of the module, between 0 and 15.
+    required: true
+    type: number
+  channelIndexParam:
+    in: path
+    name: channelIndex
+    description: The index of the channel, between 0 and one less than the number of channels on the current module.
+    required: true
+    type: number  
+responses:
+  ServerErrorResponse:
+    description: 'An error occured in the server, another service, or a remote device.'
+    schema:
+      $ref: '#/definitions/ResponseError'
+  ValidationErrorResponse:
+    description: Validation error. The request was well-formed, but one or more
+      values were invalid.
+    schema:
+      $ref: '#/definitions/ValidationError'
+paths:
+  /api/v1/files/{area}/content/{fileName}:
+    get:
+      description: Download a file.
+      operationId: "getFile"
+      produces:
+        - '*/*'
+      parameters:
+        - in: path
+          name: area
+          required: true
+          type: string
+          description: "'unsecured' or 'secured'"
+        - in: path
+          name: fileName
+          required: true
+          type: string
+      security: 
+        - apiKey: []
+      responses:
+        200:
+          description: 'The file'
+        404:
+          description: File not found
+    put:
+      description: Add a new file (up to 20M) or update an existing file with the same name.
+      operationId: "addFile"
+      parameters:
+        - in: path
+          name: area
+          required: true
+          type: string
+          description: "'unsecured' or 'secured'"
+        - in: path
+          name: fileName
+          required: true
+          type: string
+        - in: formData
+          name: file
+          required: true
+          type: file
+      consumes:
+        - multipart/form-data
+      security: 
+        - apiKey: []
+      responses:
+        200:
+          description: successful operation
+        413:
+          description: File exceeded 20M
+        500:
+          $ref: "#/responses/ServerErrorResponse"
+    delete:
+      description: Delete a file.
+      operationId: deleteFile
+      parameters:
+        - in: path
+          name: area
+          required: true
+          type: string
+          description: "'unsecured' or 'secured'"
+        - in: path
+          name: fileName
+          required: true
+          type: string
+      security: 
+        - apiKey: []
+      responses:
+        200:
+          description: successful operation
+        404:
+          description: File not found
+        500:
+          $ref: "#/responses/ServerErrorResponse"
+  /api/v1/files/{area}/info:
+    get:
+      description: List files.
+      operationId: "getFiles"
+      produces:
+        - application/json
+      parameters:
+        - in: path
+          name: area
+          required: true
+          type: string
+          description: "'unsecured' or 'secured'"
+      security: 
+        - apiKey: []
+      responses:
+        200:
+          description: "The list of files including file name, path, modified time (POSIX time), and size (bytes)"
+          schema:
+            $ref: "#/definitions/FileDetailsArray"
+        500:
+          $ref: "#/responses/ServerErrorResponse"
+  /api/v1/files/{area}/info/{fileName}:
+    get:
+      description: Get file details.
+      operationId: "getFileInfo"
+      produces:
+        - application/json
+      parameters:
+        - in: path
+          name: area
+          required: true
+          type: string
+          description: "'unsecured' or 'secured'"
+        - in: path
+          name: fileName
+          required: true
+          type: string
+      security: 
+        - apiKey: []
+      responses:
+        200:
+          description: "File details including file name, path, modified time (POSIX time), and size (bytes)"
+          schema:
+            $ref: "#/definitions/FileDetailsModel"
+        404:
+          description: File not found
+  /api/v1/io/descriptions/channels:
+    get:
+      operationId: getChannelDescriptions
+      description: Returns all Channel Descriptions.
+      security: 
+        - apiKey: []
+      responses:
+        200:
+          description: All channel descriptions.
+          schema:
+            $ref: "#/definitions/ChannelDescriptions"
+  /api/v1/io/descriptions/channels/{channelId}:
+    get:
+      operationId: getChannelDescription
+      description: Returns the Channel Description for the given Channel Type ID.
+      parameters:
+        - in: path
+          name: channelId
+          required: true
+          type: string
+          description: A string of the hexadecimal value for the Channel Type ID. For example, "0x60000002".
+      security: 
+        - apiKey: []
+      responses:
+        200:
+          description: The channel description for the given Channel Type ID.
+          schema:
+            $ref: "#/definitions/ChannelDescription"
+        404:
+          description: Invalid Channel Type ID
+          schema:
+            $ref: "#/definitions/RequestErrorDetail"
+  /api/v1/io/descriptions/modules:
+    get:
+      operationId: getModuleDescriptions
+      description: Returns all Module Descriptions.
+      security: 
+        - apiKey: []
+      responses:
+        200:
+          description: All module descriptions.
+          schema:
+            $ref: "#/definitions/ModuleDescriptions"
+  /api/v1/io/descriptions/modules/{module}:
+    get:
+      operationId: getModuleDescription
+      description: Returns the Module Description for the given module ID or product number.
+      parameters:
+        - in: path
+          name: module
+          required: true
+          type: string
+          description: The module ID (e.g. "0x90000014") or module product number (e.g. "GRV-OAC-12-I").
+      security: 
+        - apiKey: []
+      responses:
+        200:
+          description: Module description.
+          schema:
+            $ref: "#/definitions/ModuleDescription"
+        404:
+          description: Invalid module ID or name
+          schema:
+            $ref: "#/definitions/RequestErrorDetail"
+  /api/v1/io/{device}/config:
+    get:
+      operationId: getIoConfiguration
+      description: Returns the I/O Unit configuration. These are settings that affect all of the I/O modules and channels.
+      parameters:
+        - $ref: "#/parameters/deviceParam"
+      security: 
+        - apiKey: []
+      responses:
+        200:
+          description: ''
+          schema:
+            $ref: '#/definitions/IoConfiguration'
+        500:
+          $ref: "#/responses/ServerErrorResponse"
+    put:
+      operationId: setIoConfiguration
+      consumes:
+        - application/json
+      parameters:
+        - $ref: "#/parameters/deviceParam"
+        - name: body
+          in: body
+          required: true
+          schema:
+            $ref: '#/definitions/IoConfiguration'
+      security: 
+        - apiKey: []
+      responses:
+        200:
+          description: ''
+        422:
+          $ref: "#/responses/ValidationErrorResponse"
+        500:
+          $ref: "#/responses/ServerErrorResponse"
+  /api/v1/io/{device}/config/opcode:
+    post:
+      description: Send an Operation Code to the I/O unit.
+      operationId: setIoConfigurationOpCode
+      produces:
+        - application/json
+      parameters:
+        - $ref: "#/parameters/deviceParam"
+        - in: body
+          name: body
+          required: true
+          schema:
+            $ref: '#/definitions/NumericValue'
+      security: 
+        - apiKey: []
+      responses: 
+        200:
+          description: successful operation
+        400:
+          description: Bad request.
+          schema:
+            $ref: "#/definitions/RequestErrorDetail"
+        500:
+          $ref: "#/responses/ServerErrorResponse"
+  /api/v1/io/{device}/info:
+    get:
+      operationId: getIoInfo
+      description: Returns information about the I/O unit.
+      parameters:
+        - $ref: "#/parameters/deviceParam"
+      security: 
+        - apiKey: []
+      responses:
+        200:
+          description: Successful operation.
+          schema:
+            $ref: '#/definitions/IoInfo'
+        500:
+          $ref: "#/responses/ServerErrorResponse"
+  /api/v1/io/{device}/modules/{moduleIndex}/analog/values:
+    get:
+      description: Returns all the channel values of an analog module. This is the most efficient
+        way to get all the analog values. It uses a packed area of the I/O memory map.
+        Additional information about a channel is available on a channel by channel basis.
+      operationId: getModuleAnalogChannelValues
+      produces:
+        - application/json
+      parameters:
+        - $ref: "#/parameters/deviceParam"
+        - $ref: "#/parameters/moduleIndexParam"
+      security: 
+        - apiKey: []
+      responses: 
+        200:
+          description: successful operation
+          schema:
+            $ref: '#/definitions/AnalogModuleValues'
+        404:
+          description: Invalid module index
+          schema:
+            $ref: "#/definitions/RequestErrorDetail"
+        500:
+          $ref: "#/responses/ServerErrorResponse"
+  /api/v1/io/{device}/modules/{moduleIndex}/channels/{channelIndex}/analog/value:
+    put:
+      operationId: setAnalogChannelValue
+      description: Set the value of the analog channel.
+      produces:
+        - application/json
+      parameters:
+        - $ref: "#/parameters/deviceParam"
+        - $ref: "#/parameters/moduleIndexParam"
+        - $ref: "#/parameters/channelIndexParam"
+        - in: body
+          name: body
+          description: The value for the channel.
+          required: true
+          schema:
+            $ref: '#/definitions/NumericValue'
+      security: 
+        - apiKey: []
+      responses: 
+        200:
+          description: successful operation
+        404:
+          description: Invalid module or channel index
+          schema:
+            $ref: "#/definitions/RequestErrorDetail"
+        500:
+          $ref: "#/responses/ServerErrorResponse"
+  /api/v1/io/{device}/modules/{moduleIndex}/channels/{channelIndex}/analog/status:
+    get:
+      description: |
+        Returns the current status of the analog fields for the given channel.
+        
+        Does not confirm that an analog module is plugged in at the given index.
+      operationId: getChannelAnalogStatus
+      produces:
+        - application/json
+      parameters:
+        - $ref: "#/parameters/deviceParam"
+        - $ref: "#/parameters/moduleIndexParam"
+        - $ref: "#/parameters/channelIndexParam"
+      security: 
+        - apiKey: []
+      responses: 
+        200:
+          description: ''
+          schema:
+            $ref: '#/definitions/AnalogChannelRead'
+        404:
+          description: Invalid module or channel index
+          schema:
+            $ref: "#/definitions/RequestErrorDetail"
+        500:
+          $ref: "#/responses/ServerErrorResponse"
+  /api/v1/io/{device}/modules/{moduleIndex}/channels/{channelIndex}/analog/min-value/clear:
+    post:
+      operationId: clearAnalogChannelMinValue
+      description: Clear the analog channel's minimum value.
+      produces:
+        - application/json
+      parameters:
+        - $ref: "#/parameters/deviceParam"
+        - $ref: "#/parameters/moduleIndexParam"
+        - $ref: "#/parameters/channelIndexParam"
+      security: 
+        - apiKey: []
+      responses: 
+        200:
+          description: successful operation
+        404:
+          description: Invalid module or channel index
+          schema:
+            $ref: "#/definitions/RequestErrorDetail"
+        500:
+          $ref: "#/responses/ServerErrorResponse"
+  /api/v1/io/{device}/modules/{moduleIndex}/channels/{channelIndex}/analog/max-value/clear:
+    post:
+      operationId: clearAnalogChannelMaxValue
+      description: Clear the analog channel's maximum value.
+      produces:
+        - application/json
+      parameters:
+        - $ref: "#/parameters/deviceParam"
+        - $ref: "#/parameters/moduleIndexParam"
+        - $ref: "#/parameters/channelIndexParam"
+      security: 
+        - apiKey: []
+      responses: 
+        200:
+          description: successful operation
+        404:
+          description: Invalid module or channel index
+          schema:
+            $ref: "#/definitions/RequestErrorDetail"
+        500:
+          $ref: "#/responses/ServerErrorResponse"
+  /api/v1/io/{device}/modules/{moduleIndex}/channels/{channelIndex}/config:
+    parameters:
+      - $ref: "#/parameters/deviceParam"
+      - $ref: "#/parameters/moduleIndexParam"
+      - $ref: "#/parameters/channelIndexParam"
+    get:
+      operationId: getChannelConfiguration
+      produces:
+        - application/json
+      security: 
+        - apiKey: []
+      responses: 
+        200:
+          description: ''
+          schema:
+            $ref: '#/definitions/ChannelConfig'
+        404:
+          description: Invalid module or channel index
+          schema:
+            $ref: "#/definitions/RequestErrorDetail"
+        500:
+          $ref: "#/responses/ServerErrorResponse"
+    put:
+      operationId: setChannelConfiguration
+      produces:
+        - application/json
+      parameters:
+        - in: body
+          name: body
+          required: true
+          schema:
+            $ref: "#/definitions/ChannelConfigWrite"
+      security: 
+        - apiKey: []
+      responses: 
+        200:
+          description: successful operation
+        400:
+          description: Bad request.
+          schema:
+            $ref: "#/definitions/RequestErrorDetail"
+        404:
+          description: Invalid module or channel index
+          schema:
+            $ref: "#/definitions/RequestErrorDetail"
+        500:
+          $ref: "#/responses/ServerErrorResponse"
+  /api/v1/io/{device}/modules/{moduleIndex}/channels/{channelIndex}/digital/counter/active:
+    put:
+      operationId: setDigitalChannelCounterActive
+      description: Activates or deactivates a digital channel counter. Has no affect on other digital input features.
+      produces:
+        - application/json
+      parameters:
+        - $ref: "#/parameters/deviceParam"
+        - $ref: "#/parameters/moduleIndexParam"
+        - $ref: "#/parameters/channelIndexParam"
+        - in: body
+          name: body
+          description: The state for the channel.
+          required: true
+          schema:
+            $ref: '#/definitions/BooleanValue'
+      security: 
+        - apiKey: []
+      responses: 
+        200:
+          description: successful operation
+        404:
+          description: Invalid module or channel index
+          schema:
+            $ref: "#/definitions/RequestErrorDetail"
+        500:
+          $ref: "#/responses/ServerErrorResponse"
+  /api/v1/io/{device}/modules/{moduleIndex}/channels/{channelIndex}/digital/feature/clear:
+    post:
+      operationId: clearDigitalChannelFeature
+      description: Clears the digital channel feature and restarts the measurement.
+      produces:
+        - application/json
+      parameters:
+        - $ref: "#/parameters/deviceParam"
+        - $ref: "#/parameters/moduleIndexParam"
+        - $ref: "#/parameters/channelIndexParam"
+      security: 
+        - apiKey: []
+      responses: 
+        200:
+          description: successful operation
+        404:
+          description: Invalid module or channel index
+          schema:
+            $ref: "#/definitions/RequestErrorDetail"
+        500:
+          $ref: "#/responses/ServerErrorResponse"
+  /api/v1/io/{device}/modules/{moduleIndex}/channels/{channelIndex}/digital/off-latch/clear:
+    post:
+      operationId: clearDigitalChannelOffLatch
+      description: Clears the off-latch of the digital channel.
+      produces:
+        - application/json
+      parameters:
+        - $ref: "#/parameters/deviceParam"
+        - $ref: "#/parameters/moduleIndexParam"
+        - $ref: "#/parameters/channelIndexParam"
+      security: 
+        - apiKey: []
+      responses: 
+        200:
+          description: successful operation
+        404:
+          description: Invalid module or channel index
+          schema:
+            $ref: "#/definitions/RequestErrorDetail"
+        500:
+          $ref: "#/responses/ServerErrorResponse"
+  /api/v1/io/{device}/modules/{moduleIndex}/channels/{channelIndex}/digital/on-latch/clear:
+    post:
+      operationId: clearDigitalChannelOnLatch
+      description: Clears the on-latch of the digital channel.
+      produces:
+        - application/json
+      parameters:
+        - $ref: "#/parameters/deviceParam"
+        - $ref: "#/parameters/moduleIndexParam"
+        - $ref: "#/parameters/channelIndexParam"
+      security: 
+        - apiKey: []
+      responses: 
+        200:
+          description: successful operation
+        404:
+          description: Invalid module or channel index
+          schema:
+            $ref: "#/definitions/RequestErrorDetail"
+        500:
+          $ref: "#/responses/ServerErrorResponse"
+  /api/v1/io/{device}/modules/{moduleIndex}/channels/{channelIndex}/digital/state:
+    put:
+      operationId: setDigitalChannelState
+      description: Get the current state of the digital channel.
+      produces:
+        - application/json
+      parameters:
+        - $ref: "#/parameters/deviceParam"
+        - $ref: "#/parameters/moduleIndexParam"
+        - $ref: "#/parameters/channelIndexParam"
+        - in: body
+          name: body
+          description: The state for the channel.
+          required: true
+          schema:
+            $ref: '#/definitions/BooleanValue'
+      security: 
+        - apiKey: []
+      responses: 
+        200:
+          description: successful operation
+        404:
+          description: Invalid module or channel index
+          schema:
+            $ref: "#/definitions/RequestErrorDetail"
+        500:
+          $ref: "#/responses/ServerErrorResponse"
+  /api/v1/io/{device}/modules/{moduleIndex}/channels/{channelIndex}/digital/status:
+    get:
+      description:
+        Returns the current status of the digital fields for the given channel.\
+        
+        Does not confirm that a digital module is plugged in at the given index.
+      operationId: getChannelDigitalStatus
+      produces:
+        - application/json
+      parameters:
+        - $ref: "#/parameters/deviceParam"
+        - $ref: "#/parameters/moduleIndexParam"
+        - $ref: "#/parameters/channelIndexParam"
+      security: 
+        - apiKey: []
+      responses: 
+        200:
+          description: ''
+          schema:
+            $ref: '#/definitions/DigitalChannelRead'
+        404:
+          description: Invalid module or channel index
+          schema:
+            $ref: "#/definitions/RequestErrorDetail"
+        500:
+          $ref: "#/responses/ServerErrorResponse"
+  /api/v1/io/{device}/modules/{moduleIndex}/channels/names:
+    get:
+      description: Returns the channel names for the given module.
+      operationId: getChannelNames
+      produces:
+        - application/json
+      parameters:
+        - $ref: "#/parameters/deviceParam"
+        - $ref: "#/parameters/moduleIndexParam"
+      security: 
+        - apiKey: []
+      responses: 
+        200:
+          description: The names for the given module index.
+          schema:
+            $ref: '#/definitions/ChannelNames'
+        404:
+          description: Invalid module index
+          schema:
+            $ref: "#/definitions/RequestErrorDetail"
+        500:
+          $ref: "#/responses/ServerErrorResponse"
+  /api/v1/io/{device}/modules/{moduleIndex}/config:
+    get:
+      description: Returns the configuration for the given module.
+      operationId: getModuleConfiguration
+      produces:
+        - application/json
+      parameters:
+        - $ref: "#/parameters/deviceParam"
+        - $ref: "#/parameters/moduleIndexParam"
+      security: 
+        - apiKey: []
+      responses: 
+        200:
+          description: ''
+          schema:
+            $ref: '#/definitions/ModuleChannelConfig'
+        404:
+          description: Invalid module index
+          schema:
+            $ref: "#/definitions/RequestErrorDetail"
+        500:
+          $ref: "#/responses/ServerErrorResponse"
+  /api/v1/io/{device}/modules/{moduleIndex}/digital/values:
+    get:
+      description: Returns all the channel values of a digital module. This is the most efficient
+        way to get all the digital values. It uses a packed area of the I/O memory map.
+        Additional information about a channel is available on a channel by channel basis.
+      operationId: getModuleDigitalChannelValues
+      produces:
+        - application/json
+      parameters:
+        - $ref: "#/parameters/deviceParam"
+        - $ref: "#/parameters/moduleIndexParam"
+      security: 
+        - apiKey: []
+      responses: 
+        200:
+          description: successful operation
+          schema:
+            $ref: '#/definitions/DigitalModuleValues'
+        404:
+          description: Invalid module index
+          schema:
+            $ref: "#/definitions/RequestErrorDetail"
+        500:
+          $ref: "#/responses/ServerErrorResponse"
+  /api/v1/io/{device}/modules/{moduleIndex}/info:
+    get:
+      description: Returns information about the module at the given slot index.
+      operationId: getModuleInfo
+      parameters:
+        - $ref: "#/parameters/deviceParam"
+        - $ref: "#/parameters/moduleIndexParam"
+      security: 
+        - apiKey: []
+      responses:
+        200:
+          description: ''
+          schema:
+            $ref: '#/definitions/ModuleInfo'
+        404:
+          description: Invalid module index
+          schema:
+            $ref: "#/definitions/RequestErrorDetail"
+        500:
+          $ref: "#/responses/ServerErrorResponse"
+  /api/v1/io/{device}/modules/quality:
+    get:
+      description: Returns quality flags for all the module slots on the rack.
+      operationId: getModuleQualityFlags
+      parameters:
+        - $ref: "#/parameters/deviceParam"
+      security: 
+        - apiKey: []
+      responses:
+        200:
+          description: ''
+          schema:
+            $ref: '#/definitions/ModuleQualityFlags'
+        500:
+          $ref: "#/responses/ServerErrorResponse"
+  /api/v1/io/{device}/modules/type:
+    get:
+      description: Returns all the types of modules plugged into the rack.
+      operationId: getModuleTypes
+      parameters:
+        - $ref: "#/parameters/deviceParam"
+      security: 
+        - apiKey: []
+      responses:
+        200:
+          description: ''
+          schema:
+            $ref: '#/definitions/ModuleTypes'
+        500:
+          $ref: "#/responses/ServerErrorResponse"
+  /api/v1/io/{device}/modules/info:
+    get:
+      description: Returns information about all the modules plugged into the rack.
+      operationId: getModuleInfos
+      parameters:
+        - $ref: "#/parameters/deviceParam"
+      security: 
+        - apiKey: []
+      responses:
+        200:
+          description: ''
+          schema:
+            type: object
+            required: [modules]
+            properties:
+              modules:
+                description:
+                  An array of ModuleInfo objects describing the modules on a rack. The array index matches the module index on the rack.
+                type: array
+                items:
+                  $ref: '#/definitions/ModuleInfo'
+        500:
+          $ref: "#/responses/ServerErrorResponse"
+  /api/v1/io/{device}/mmp/address:
+    put:
+      description: Writes to one or more OptoMMP memory map addresses.
+      operationId: setMmpValues
+      parameters:
+        - $ref: "#/parameters/deviceParam"
+        - in: body
+          name: body
+          required: true
+          description: An array of values and address to write.
+
+            The array must have between 1 and 256 elements. Otherwise, 400 is returned.
+          schema:
+            $ref: '#/definitions/MmpGenericValues'
+      security: 
+        - apiKey: []
+      responses:
+        200:
+          description: successful operation
+        400:
+          description: Bad request.
+          schema:
+            $ref: "#/definitions/RequestErrorDetail"
+        404:
+          description: Resource not found.
+          schema:
+            $ref: "#/definitions/RequestErrorDetail"
+        500:
+          $ref: "#/responses/ServerErrorResponse"
+  /api/v1/io/{device}/mmp/address/{address}:
+    get:
+      description: Returns the value at the given OptoMMP memory map address.
+      operationId: getMmpValues
+      parameters:
+        - $ref: "#/parameters/deviceParam"
+        - in: path
+          name: address
+          description: A hexadecimal address. For example, "0xF0D81100".
+          required: true
+          type: string
+        - in: query
+          name: type
+          description: "One of 'int8', 'uint8', 'int32', 'uint32', 'float', 'string'. This is how the raw memory will be interpreted."
+          default: int32
+          required: false
+          type: string
+        - in: query
+          name: length
+          required: false
+          type: number
+          description: For numbers, this is the number of elements to return. It must be 256 or less. For a string, this is the number of bytes to read, and must be 1024 or less.
+        - in: query
+          name: encoding
+          description: "One of 'ascii' or 'utf8'. This is how the raw memory will be interpreted."
+          required: false
+          type: string
+      security: 
+        - apiKey: []
+      responses:
+        200:
+          description: ''
+          schema:
+            $ref: '#/definitions/AbstractMmpValues'
+        400:
+          description: Bad request.
+          schema:
+            $ref: "#/definitions/RequestErrorDetail"
+        404:
+          description: Resource not found.
+          schema:
+            $ref: "#/definitions/RequestErrorDetail"
+        500:
+          $ref: "#/responses/ServerErrorResponse"
+    put:
+      description: Writes a value at the given OptoMMP memory map address.
+      operationId: setMmpValue
+      parameters:
+        - $ref: "#/parameters/deviceParam"
+        - in: path
+          name: address
+          description: A hexadecimal address. For example, "0xF0D81100".
+          required: true
+          type: string
+        - in: body
+          name: body
+          required: true
+          schema:
+            $ref: '#/definitions/MmpNumericValue'
+      security: 
+        - apiKey: []
+      responses:
+        200:
+          description: successful operation
+        400:
+          description: Bad request.
+          schema:
+            $ref: "#/definitions/RequestErrorDetail"
+        404:
+          description: Resource not found.
+          schema:
+            $ref: "#/definitions/RequestErrorDetail"
+        500:
+          $ref: "#/responses/ServerErrorResponse"
+definitions:
+  AbstractChannelRead:
+    type: object
+    discriminator: modelType
+    required: [modelType, moduleIndex, channelIndex, qualityDetail]
+    properties:
+      modelType:
+        description: Discriminator for the model type. Either 'AnalogChannelRead' or 'DigitalChannelRead'.
+        type: string
+      moduleIndex:
+        description: The index of the module, between 0 and 15.
+        type: number
+      channelIndex:
+        description: The index of the channel, between 0 and one less than the number of channels on the current module.
+        type: number
+      qualityDetail:
+        type: number
+  AbstractMmpValues:
+    type: object
+    discriminator: dataType
+    required: [dataType]
+    properties:
+      dataType:
+        $ref: '#/definitions/MmpValueType'
+  AnalogChannelRead:
+    type: object
+    allOf:
+    - $ref: '#/definitions/AbstractChannelRead'
+    - type: object
+      required: [value,minValue,maxValue]
+      properties:
+        value:
+          type: number
+        minValue:
+          type: number
+        maxValue:
+          type: number
+  BooleanValue:
+    type: object
+    required: [value]
+    properties:
+      value:
+        type: boolean
+  ChannelConfig:
+    type: object
+    description: ''
+    required: [modelType, moduleType, channelType, moduleIndex, channelIndex, name,
+      watchdogValue, watchdogEnabled, qualityEnabled,
+      feature,       
+      unit, offset, gain, scaledLower, scaledUpper, clampLower, clampUpper,
+      averageFilterWeight, simpleMovingAverageReadings,
+      steinhartHartCoefficientA, steinhartHartCoefficientB, steinhartHartCoefficientSecondOrder, steinhartHartCoefficientC  ]
+    properties:
+      moduleType:
+        type: number
+      channelType:
+        type: number
+      moduleIndex:
+        description: The index of the module, between 0 and 15.
+        type: number
+      channelIndex:
+        description: The index of the channel, between 0 and one less than the number of channels on the current module.
+        type: number
+      name:
+        type: string
+      watchdogValue:
+        type: number
+      watchdogEnabled:
+        type: boolean
+      qualityEnabled:
+        type: boolean
+      feature:
+        description: '[Digital Only]'
+        type: number
+      unit:
+        description: '[Analog Only]'
+        type: string
+      offset:
+        description: '[Analog Only]'
+        type: number
+      gain:
+        description: '[Analog Only]'
+        type: number
+      scaledLower:
+        description: '[Analog Only]'
+        type: number
+      scaledUpper:
+        description: '[Analog Only]'
+        type: number
+      clampLower:
+        description: '[Analog Only]'
+        type: number
+      clampUpper:
+        description: '[Analog Only]'
+        type: number
+      averageFilterWeight:
+        description: '[Analog Only]'
+        type: number
+      simpleMovingAverageReadings:
+        description: '[Analog Only]'
+        type: number
+      steinhartHartCoefficientA:
+        description: '[Analog Only, Since Firmware 1.3.0]'
+        type: number
+      steinhartHartCoefficientB:
+        description: '[Analog Only, Since Firmware 1.3.0]'
+        type: number
+      steinhartHartCoefficientSecondOrder:
+        description: '[Analog Only, Since Firmware 1.3.0]'
+        type: number
+      steinhartHartCoefficientC:
+        description: '[Analog Only, Since Firmware 1.3.0]'
+        type: number
+  ChannelConfigWrite:
+    type: object
+    properties:
+      name:
+        type: string
+      watchdogValue:
+        type: number
+      watchdogEnabled:
+        type: boolean
+      feature:
+        type: number
+        description: Only used for digital.
+      channelType:
+        type: string
+        description: Only used for analog. Must be in hexadecimal format.
+      unit:
+        type: string
+        description: user-provided unit string.
+      qualityEnabled:
+        type: boolean
+        description: Only used for analog.
+      offset:
+        type: number
+        description: Only used for analog.
+      gain:
+        type: number
+        description: Only used for analog.
+      scaledLower:
+        type: number
+        description: Only used for analog.
+      scaledUpper:
+        type: number
+        description: Only used for analog.
+      clampLower:
+        type: number
+        description: Only used for analog.
+      clampUpper:
+        type: number
+        description: Only used for analog.
+      averageFilterWeight:
+        type: number
+        description: Only used for analog.
+      simpleMovingAverageReadings:
+        type: number
+        description: Only used for analog.
+      steinhartHartCoefficientA:
+        description: Only used for analog. Since firmware 1.3.0.
+        type: number
+      steinhartHartCoefficientB:
+        description: Only used for analog. Since firmware 1.3.0.
+        type: number
+      steinhartHartCoefficientSecondOrder:
+        description: Only used for analog. Since firmware 1.3.0.
+        type: number
+      steinhartHartCoefficientC:
+        description: Only used for analog. Since firmware 1.3.0.
+        type: number
+  ChannelDescription:
+    type: object
+    required: [channelTypeId, name]
+    properties:
+      channelTypeId:
+        type: string
+        description: A string version of the hexadecimal value of the Channel Type. Each channel type
+          has a unique ID, which is a 32-bit unsigned number. For example, "0x60000002".
+      name:
+        description: The name of the __Channel Type__. For example, "±1200mV".
+        $ref: '#/definitions/I18nString'
+      engineeringUnits:
+        type: string
+        description: The default Engineering Units. For example, "mV".
+      minUnderScale:
+        type: number
+        description: Minimum signal amplitude this channel type can measure or output.
+      maxOverScale:
+        type: number
+        description: Maximum signal amplitude this channel type can measure or output.
+      lowScale:
+        type: number
+        description: Low end of published range of signal amplitude for this channel type.
+      highScale:
+        type: number
+        description: High end of published range of signal amplitude for this channel type.
+  ChannelDescriptions:
+    type: object
+    description: An object map of Channel Descriptions. The property name for each item in the object is the _channelTypeId_ for the Channel Description.
+    additionalProperties:
+      $ref: '#/definitions/ChannelDescription'
+  ChannelNames:
+    type: object
+    description: An array of the user-defined channel names of a particular module.
+    required: [names]
+    properties:
+      names:
+        type: array
+        items:
+          type: string
+        description: An array of strings containing channel names. The index of the channel matches the index in the array.
+  DigitalChannelRead:
+    type: object
+    allOf:
+    - $ref: '#/definitions/AbstractChannelRead'
+    - type: object
+      required: [state, onLatchState, offLatchState, featureType, featureValue, counterActive]
+      properties:
+        state:
+          type: boolean
+        onLatchState:
+          type: boolean
+        offLatchState:
+          type: boolean
+        featureType:
+          type: number
+        featureValue:
+          type: number
+        counterActive:
+          type: boolean
+  FileAreaType:
+    type: string
+    enum: 
+    - secured
+    - unsecured
+  FileDetailsModel:
+    type: "object"
+    required: [name, path, modified, size]
+    properties:
+      name:
+        type: string
+        description: ''
+      path:
+        type: string
+        description: ''
+      modified:
+        type: number
+        description: ''
+      size:
+        type: number
+        description:  ''
+  FileDetailsArray:
+    type: array
+    items:
+      $ref: '#/definitions/FileDetailsModel'
+  I18nString:
+    type: object
+    required: [en]
+    properties:
+      en:
+        type: string
+        description: The English version of the text.
+  IoConfiguration:
+    type: object
+    required: [watchdogMs, degreesF, modbusFloatFormat]
+    properties:
+      watchdogMs:
+        type: number
+        description: The watchdog time in milliseconds. 0 disables the watchdog. This is the amount
+          of time the I/O unit will wait for communication from the host device before timing out.
+      degreesF:
+        type: boolean
+        description: |
+          Flag for controlling the unit used for temperature inputs. 
+          
+          - 0 = degrees C
+          - non-0 = degrees F
+      modbusFloatFormat:
+        type: number
+        description: |
+          Format of floating-point values for Modbus.
+          
+          - 0 for Big Endian.
+          - 1 for Big Endian, word swapped. Most significant bit of float is in the most significant register.
+  IoFirmare:
+    type: object
+    description: Version information about the I/O server.
+    required: [version, date, time]
+    properties:
+      version:
+        type: string
+        description: Version of I/O server.
+      date:
+        type: string
+        description: Date that the I/O server was built. For example, "06/08/2018".
+      time:
+        type: string
+        description: Time that the I/O server was built. For example, "08:58:38".
+  IoHardware:
+    type: object
+    description: Version information about the I/O hardware.
+    required: [part, revision]
+    properties:
+      part:
+        type: string
+        description: The part name of the hardware. For example, "GRV-EPIC-PR1".
+      revision:
+        type: string
+        description: The date of the hardwre design revision. For example, "05/31/2018".
+  IoInfo:
+    type: object
+    required: [mmpRev, pucFlag, firmware, hardware]
+    properties:
+      mmpRev:
+        description: Memory Map revision number.
+        type: number
+      pucFlag:
+        type: boolean
+        description: Powerup Clear flag. (0 = OK; anything else means a Powerup Clear
+          is needed)
+      firmware:
+        $ref: '#/definitions/IoFirmare'
+      hardware:
+        $ref: '#/definitions/IoHardware'
+  MmpNumericValue:
+    type: object
+    required: [value]
+    properties:
+      value:
+        type: number
+      type:
+        $ref: '#/definitions/MmpValueType'
+  MmpGenericValues:
+    description: A list of MMP values of any type.
+    type: object
+    required: [values]
+    properties:
+      values:
+        type: array
+        items:
+          type: object
+          required: [address, type]
+          properties:
+            address:
+              description: String version of the MMP address. Can be either decimal or hexadecimal.
+              type: string
+            stringValue:
+              type: string 
+            numberValue:
+              type: number
+              description: Float values are returned as doubles. Float values may also be a
+                string type, with a value of either 'NaN', 'Infinity', or '-Infinity'.
+            type:
+              $ref: '#/definitions/MmpValueType'
+      encoding:
+        description: "One of 'ascii' or 'utf8'. This is how the raw memory will be interpreted."
+        type: string
+        default: ascii
+  MmpNumericValues:
+    type: object
+    allOf:
+    - $ref: '#/definitions/AbstractMmpValues'
+    - type: object
+      required: [values]
+      properties:
+        mmpValues:
+          type: array
+          items:
+            type: number
+            description: Float values are returned as doubles. Float values may also be a string 'NaN', 'Infinity', or '-Infinity'.
+  MmpStringValues:
+    type: object
+    allOf:
+    - $ref: '#/definitions/AbstractMmpValues'
+    - type: object
+      required: [values]
+      properties:
+        mmpValues:
+          type: array
+          items:
+            type: string
+  MmpValueType:
+    type: string
+    enum:
+    - int8
+    - uint8
+    - int32
+    - uint32
+    - float
+    - string
+  ModuleChannelDescriptions:
+    type: object
+    required: [channelTypes, defaultChannelType]
+    properties:
+      channelTypes:
+        type: array
+        items:
+          type: string
+      defaultChannelType:
+        type: string
+  ModuleDescription:
+    type: object
+    required: [schemaVersion, contentVersion, moduleId, productNumber, numberOfChannels, productDescription, channelDescriptions, productSpecification]
+    properties:
+      schemaVersion:
+        type: string
+        description: Version of schema used for this module description. For example, "2.0.1".
+      contentVersion:
+        type: string
+        description: Version of the content in this module description. For example, "1.1.2".
+      moduleId:
+        type: string
+        description: '' 
+      productNumber:
+        type: string
+        description: Opto 22 part number for this product. Format for Groov modules is GRV-<signal type>-<num channels>-<other properties>
+      numberOfChannels:
+        type: number
+        description: Number of channels on this module.
+      productDescription:
+        $ref: '#/definitions/I18nString'
+        description: Brief product description.
+      channelDescriptions:
+        $ref: '#/definitions/ModuleChannelDescriptions'
+        description: Specifies the channelTypes that are supported by each channel on this module.
+          The channel can be configured to function as a particular channel type by configuring it
+          with the channel type ID of that type.
+      productSpecification:
+        type: object
+        description: A localized and ordered list of key-value pairs that may rendered as a
+          specification table in a document or user interface.
+        properties:
+          en:
+            type: object
+            description: The default module specification in English.
+        additionalProperties:
+          type: object
+          description: Locale code for the specification table.
+          additionalProperties:
+            type: object
+            description: The module specification for the named locale.
+  ModuleDescriptions:
+    type: object
+    description: A collection of Modules Descriptions. The property name for each item in the object
+      is the _moduleId_ for the Module Description.
+    additionalProperties:
+      $ref: '#/definitions/ModuleDescription'
+  ModuleChannelConfig:
+    type: object
+    required: [index, typeID, typeName, channels]
+    properties:
+      index:
+        type: number
+      typeID:
+        type: string
+      typeName:
+        type: string
+      channels:
+        type: array
+        items:
+          $ref: '#/definitions/ChannelConfig'
+  ModuleQualityFlags:
+    type: object
+    required: [qualityMask]
+    properties:
+      qualityMask:
+        description: A bitmask for module quality. A bit will be set if any channel on the corresponding
+          module has an error condition. A bit will also be set if a module is not present in the corresponding
+          slot on the rack.
+        type: number
+  AnalogModuleValues:
+    type: object
+    required: [moduleIndex, channelValues]
+    properties:
+      moduleIndex:
+        type: number
+      channelValues:
+        type: array
+        description: An array of objects containing analog values and quality error flags.
+          The index of the channel matches the index in the array.
+        items:
+          type: object
+          required: [value, qualityError]
+          properties:
+            value:
+              type: number
+              description: The current value of the analog channel.
+            qualityError:
+              type: boolean
+              description: ''
+  DigitalModuleValues:
+    type: object
+    required: [moduleIndex, channelValues]
+    properties:
+      moduleIndex:
+        description: The module index.
+        type: number
+      channelValues:
+        description: An array of objects containing digital states and quality error flags.
+          The index of the channel matches the index in the array.
+        type: array
+        items:
+          type: object
+          required: [state, onLatch, offLatch, qualityError]
+          properties:
+            state:
+              type: boolean
+              description: ''
+            onLatch:
+              type: boolean
+              description: ''
+            offLatch:
+              type: boolean
+              description: ''
+            qualityError:
+              type: boolean
+  ModuleType:
+    type: object
+    required: [index, type, name]
+    properties:
+      index:
+        description: The module index.
+        type: number
+      type:
+        description: A string version of the hexadecimal value of the module type ID. Each module type
+          has a unique ID, which is a 32-bit unsigned number. For example, "0x5000000F" for GRV-IAC-24.
+          If no module is plugged into a slot, then "id" will be "0x00000000".
+        type: string
+      name:
+        description: The name of the module, or an empty string if a module is not plugged into the slot.
+          For example, "GRV-IAC-24".
+        type: string
+  ModuleTypes:
+    type: object
+    required: [types]
+    properties:
+      types:
+        description:
+          An array of modules on the rack. The array index matches the module index on the rack.
+        type: array
+        items:
+          $ref: '#/definitions/ModuleType'
+  ModuleInfo:
+    type: object
+    required: [index, moduleId]
+    properties:
+      index:
+        description: The module index.
+        type: number
+      moduleId:
+        description: 'For example, "0x94000019". Will be "0x00000000" if no module is plugged in.'
+        type: string
+      firmwareMode:
+        description: ''
+        type: number
+      mfgSerialNumber:
+        description: The unique serial number of the module. For example, 728410.
+        type: number
+      hardwareRevisionDate:
+        description: YYYY-MM-DD format. For example, "2016-3-1".
+        type: string
+      loaderProgramNumber:
+        description: For example, "37672".
+        type: string
+      loaderDate:
+        description: '"YYYY-MM-DD" format. For example, "2016-05-30".'
+        type: string
+      loaderTime:
+        description: '"HH:MM:SS" format. For example, "14:46:03".'
+        type: string
+      loaderVersion:
+        description: '"AM.ma" format. For example, "R1.0g".'
+        type: string
+      firmwareProgramNumber:
+        description: For example, "0".
+        type: string
+      firmwareDate:
+        description: '"YYYY-MM-DD" format. For example, "2016-05-30".'
+        type: string
+      firmwareTime:
+        description: '"HH:MM:SS" format. For example, "14:46:03".'
+        type: string
+      firmwareVersion:
+        description: '"AM.ma" format. For example, "R1.0g".'
+        type: string
+  NumericValue:
+    type: object
+    required: [value]
+    properties:
+      value:
+        type: number
+  RequestError:
+    type: object
+    required: [error]
+    properties:
+      error:
+        $ref: "#/definitions/RequestErrorDetail"
+  RequestErrorDetail:
+    type: object
+    required: [message]
+    properties:
+      message:
+        description: A human-readable message describing the error. 
+          The message is not fixed and might change without notice.
+        type: string
+  ResponseError:
+    type: object
+    required: [error]
+    properties:
+      error:
+        $ref: "#/definitions/ResponseErrorDetail"
+  ResponseErrorDetail:
+    type: object
+    required: [code, message]
+    properties:
+      code:
+        description: |
+          The unique error code for this error. 
+          
+          - 1: General Error
+          - 2: Validation
+          - 3: Timeout
+          - 4: Not Connected to service or device.
+          - 5: Operation Busy. Only one instance of the operation may be running at a time.
+          - 6: MMP Error. See "subCode" field for additional error code.
+        type: number
+      subCode:
+        description: |
+          An additional error code for this error.
+
+          __MMP Errors (_code_ is 6):__
+          - 5: TransactionLabelMismatch
+          - 57345 (0xE001): Undefined Command
+          - 57346 (0xE002): Invalid Point Type
+          - 57349 (0xE005): Invalid memory address or invalid data for the memory address.
+        type: number
+      message:
+        description: A human-readable message describing the error. 
+          The message is not fixed and might change without notice.
+        type: string
+  ValidationError:
+    type: object
+    required: [error]
+    properties:
+      error:
+        $ref: "#/definitions/ValidationErrorDetail"
+  ValidationErrorDetail:
+    type: object
+    required: [code, message, fields]
+    properties:
+      code:
+        description: The unique error code for this error. For validation errors, the error code is 2.
+        type: number
+      message:
+        description: A human-readable message describing the error. 
+          The message is not fixed and might change without notice.
+        type: string
+      fields:
+        description: List of fields that did not validate.
+        type: array
+        items:
+          type: string
+  

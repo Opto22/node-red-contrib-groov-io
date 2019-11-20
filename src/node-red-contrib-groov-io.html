@@ -1,0 +1,774 @@
+<script type="text/javascript">
+
+    RED.nodes.registerType('groov-io-input', {
+        category: 'Opto22',
+        color: '#e87070',
+        defaults: {
+            // This should match the NodeConfiguration interface in the corresponding "ts" file.
+            device: { value: "", type: "groov-io-device", required: true },
+            dataType: { value: "channel-digital-state" },
+            moduleIndex: { value: null },
+            channelIndex: { value: null },
+            mmpAddress: { value: '0xF0D81000' },
+            mmpType: { value: 'int32' },
+            mmpLength: { value: '1' },
+            mmpEncoding: { value: 'ascii' },
+            sendInitialValue: {value: true},
+            deadband: { value: '1' },
+            scanTimeSec: { value: '1.0' },
+            name: { value: "" }
+        },
+        outputs: 1,
+        icon: "groov-io-node-red.png",
+        label: function () {
+            return getLabel(this, "groov i/o input");
+        },
+        paletteLabel: "groov i/o input",
+        oneditprepare: function () {
+            // called when the edit dialog is being built.
+
+            $("#node-input-dataType").change(function () {
+                updateShownFields(true, false, false);
+            });
+            $("#node-input-mmpType").change(function () {
+                updateShownFields(true, false, false);
+            });
+        }
+    });
+
+
+
+
+    RED.nodes.registerType('groov-io-read', {
+        category: 'Opto22',
+        color: '#e87070',
+        defaults: {
+            // This should match the NodeConfiguration interface in the corresponding "ts" file.
+            device: { value: "", type: "groov-io-device", required: true },
+            dataType: { value: "channel-digital" },
+            moduleIndex: { value: null },
+            channelIndex: { value: null },
+            mmpAddress: { value: '0xF0D81000' },
+            mmpType: { value: 'int32' },
+            mmpLength: { value: '1' },
+            mmpEncoding: { value: 'ascii' },
+            value: { value: "" },
+            valueType: { value: "msg.payload" },
+            itemName: { value: "" },
+            name: { value: "" }
+        },
+        inputs: 1,
+        outputs: 1,
+        icon: "groov-io-node-red.png",
+        label: function () {
+            return getLabel(this, "groov i/o read");
+        },
+        paletteLabel: "groov i/o read",
+        oneditprepare: function () {
+            // called when the edit dialog is being built.
+
+            $("#node-input-dataType").change(function () {
+                updateShownFields(false, true, false);
+            });
+            $("#node-input-mmpType").change(function () {
+                updateShownFields(false, true, false);
+            });
+
+            $("#node-input-valueType").val(this.valueType);
+
+            $("#node-input-value").typedInput({
+                default: 'msg.payload',
+                typeField: $("#node-input-valueType"),
+                types: [
+                    'msg',
+                    { value: "msg.payload", label: "msg.payload", hasValue: false }
+                ]
+            });
+        }
+    });
+
+    RED.nodes.registerType('groov-io-write', {
+        category: 'Opto22',
+        color: '#e87070',
+        defaults: {
+            // This should match the NodeConfiguration interface in the corresponding "ts" file.
+            device: { value: "", type: "groov-io-device", required: true },
+            dataType: { value: "channel-digital" },
+            moduleIndex: { value: null },
+            channelIndex: { value: null },
+            mmpAddress: { value: '0xF0D81000' },
+            mmpType: { value: 'int32' },
+            mmpLength: { value: '1' },
+            mmpEncoding: { value: 'ascii' },
+            value: { value: "" },
+            valueType: { value: "msg.payload" },
+            name: { value: "" }
+        },
+        inputs: 1,
+        outputs: 1,
+        icon: "groov-io-node-red.png",
+        align: 'right',
+        label: function () {
+            return getLabel(this, "groov i/o write");
+        },
+        paletteLabel: "groov i/o write",
+        oneditprepare: function () {
+            // called when the edit dialog is being built.
+            $("#node-input-dataType").change(function () {
+                updateShownFields(false, false, true);
+            });
+            $("#node-input-mmpType").change(function () {
+                updateShownFields(false, false, true);
+            });
+
+            $("#node-input-value").typedInput({
+                default: 'msg.payload',
+                typeField: $("#node-input-valueType"),
+                types: [
+                    'msg',
+                    { value: "msg.payload", label: "msg.payload", hasValue: false },
+                    { value: "value", label: "Value", hasValue: true }
+                ]
+            });
+        }
+    });
+
+    RED.nodes.registerType('groov-io-device', {
+        category: 'config',
+        // The defaults object should match the GroovDevice class in groov.ts.
+        defaults: {
+            address: { value: "localhost", required: true },
+            msgQueueFullBehavior: { value: "DROP_OLD", required: true}
+        },
+        credentials: {
+            apiKey: { type: "password", required: true },
+            publicCertPath: { type: "text" },
+            caCertPath: { type: "text" }
+        },
+        label: function () {
+            return this.address;
+        },
+        oneditprepare: function () {
+        }
+    });
+
+    function getLabel(node, defaultLabel) {
+        // Always go with a node's name, if it's been configured.
+        if (node.name) {
+            return node.name;
+        }
+
+        var label;
+
+        // Otherwise, use the data type. Only do this if the device has also been configured.
+        // If not, then this is probably a brand new node, and we should just fall through 
+        // and go with the default name.
+        if (!label && node.device !== '') {
+            label = node.dataType.replace(/-/g, ' ');;
+            // label = dataTypeToLabel(node.dataType);
+        }
+
+        // If all else fails, use the default label.
+        if (!label) {
+            label = defaultLabel;
+        }
+
+        return label;
+    }
+
+    function updateShownFields(isInputNode, isReadNode, isWriteNode) {
+        var dataTypeId = $("#node-input-dataType option:selected").val();
+        var mmpTypeId = $("#node-input-mmpType option:selected").val();
+
+        var showNameField = false;
+        var showModuleIndex = false;
+        var showChannelIndex = false;
+        var showMmpFields = false;
+        var showStringEncoding = false;
+        var showValueField = true;
+        var showInputDeadband = false;
+        var showInputScanTime = false;
+
+        // See if a Table type is selected.
+        if (dataTypeId.indexOf('type-description') >= 0) {
+            showNameField = true;
+        }
+        else if (dataTypeId.indexOf('channel') >= 0) {
+            showModuleIndex = true;
+            showChannelIndex = true;
+        }
+        else if (dataTypeId.indexOf('module-') >= 0) {
+            showModuleIndex = true;
+        }
+        else if (dataTypeId.indexOf('mmp') >= 0) {
+            showMmpFields = true;
+        }
+
+        if (isInputNode) {
+            if ((dataTypeId == 'channel-analog') ||
+                (dataTypeId == 'channel-digital-feature-value')) {
+                showInputDeadband = true;
+            }
+            if (dataTypeId == 'mmp-address') {
+                if (mmpTypeId != 'string') {
+                    showInputDeadband = true;
+                }
+            }
+
+            // Hide for now
+            // showInputScanTime = true;
+        }
+
+
+        if ((isReadNode && dataTypeId.indexOf('channel-clear') >= 0) ||
+            (isWriteNode && dataTypeId.indexOf('channel-config') >= 0) ||
+            (isWriteNode && dataTypeId.indexOf('channel-counter') >= 0)) {
+            showValueField = false;
+        }
+
+        if (mmpTypeId == 'string') {
+            showStringEncoding = true;
+        }
+
+        if (showModuleIndex || showChannelIndex) {
+            // Show the row
+            $("#moduleAndChannelFields").show();
+
+            // We never hide the module index.
+
+            // See if the channel index should be shown.
+            if (showChannelIndex) {
+                $("#node-input-channelIndexLabel").show();
+                $("#node-input-channelIndex").show();
+            }
+            else {
+                $("#node-input-channelIndexLabel").hide();
+                $("#node-input-channelIndex").hide();
+            }
+        }
+        else {
+            $("#moduleAndChannelFields").hide();
+        }
+
+        if (showMmpFields) {
+            $("#mmpFields1").show();
+            $("#mmpFields2").show();
+
+            if (showStringEncoding) {
+                $("#node-input-mmpEncodingLabel").show();
+                $("#node-input-mmpEncoding").show();
+            } else {
+                $("#node-input-mmpEncodingLabel").hide();
+                $("#node-input-mmpEncoding").hide();
+            }
+
+        } else {
+            $("#mmpFields1").hide();
+            $("#mmpFields2").hide();
+        }
+
+        if (showValueField) {
+            $("#valueRow").show();
+        } else {
+            $("#valueRow").hide();
+        }
+
+        if (showNameField) {
+            $("#itemNameRow").show();
+        } else {
+            $("#itemNameRow").hide();
+        }
+
+        if (showInputScanTime) {
+            $('#scanTimeRow').show();
+        }
+        else {
+            $('#scanTimeRow').hide();
+        }
+
+        if (showInputDeadband) {
+            $('#deadbandRow').show();
+        }
+        else {
+            $('#deadbandRow').hide();
+        }
+    }
+
+</script>
+
+<script type="text/x-red" data-template-name="groov-io-read">
+    <div class="form-row" id="pacAddressRow">
+        <label for="node-input-device"><i class="fa fa-globe"></i> Device</label>
+        <input type="text" id="node-input-device">
+    </div>
+    <div class="form-row" id="dataTypeRow">
+        <label for="node-input-dataType"><i class="fa fa-tasks"></i> Data Type</label>
+        <select type="text" id="node-input-dataType" style="width: 300px;">
+            <option value="channel-digital">Digital Channel</option>
+            <option value="channel-analog">Analog Channel</option>
+            <option value="channel-config">Channel Configuration</option>
+            <option value="" disabled>————————————————</option>
+            <option value="module-digital">Digital Module Values</option>
+            <option value="module-analog">Analog Module Values</option>
+            <!-- <option value="module-info">Module Info</option> -->
+            <!-- <option value="module-config">Module Configuration</option> -->
+            <option value="" disabled>————————————————</option>
+            <!-- <option value="modules-type">All Modules - Type</option> -->
+            <!-- <option value="modules-info">All Modules - Info</option> -->
+            <option value="modules-quality">All Modules - Quality Flags</option>
+            <option value="" disabled>————————————————</option>
+            <!-- <option value="io-unit-info">I/O Unit Info</option> -->
+            <!-- <option value="io-unit-config">I/O Unit Configuration</option> -->
+            <!-- <option value="" disabled>————————————————</option> -->
+            <option value="mmp-address">MMP Address</option>
+            <!-- <option value="" disabled>————————————————</option> -->
+            <!-- <option value="channel-type-description">Channel Type Description</option> -->
+            <!-- <option value="module-type-description">Module Type Description</option> -->
+        </select>
+    </div>
+    <div class="form-row" id="itemNameRow">
+        <label for="node-input-itemName"><i class="fa fa-tag"></i> Name</label>
+        <input type="text" id="node-input-itemName"  placeholder="Blank for all" style="width: 300px;">
+    </div>
+    <div class="form-row hidden" id="moduleAndChannelFields">
+        <!-- FORMATTING NOTE: Avoid whitespace between inline-block elements by removing spaces
+            between the HTML elements. -->
+        <label id="node-input-moduleIndexLabel"  for="node-input-moduleIndex" ><i class="fa fa-thumb-tack"></i> Module Index</label>
+        <input id="node-input-moduleIndex"       type="text" style="width: 75px;"
+        ><label id="node-input-channelIndexLabel" for="node-input-channelIndex"  style="margin-left: 25px; width: 125px;"><i class="fa fa-thumb-tack"></i> Channel Index
+        </label><input id="node-input-channelIndex"      type="text" style="width: 75px;"></input>
+    </div>
+    <div class="form-row hidden" id="mmpFields1">
+        <!-- FORMATTING NOTE: Avoid whitespace between inline-block elements by removing spaces
+            between the HTML elements. -->
+        <label for="node-input-mmpAddress"><i class="fa fa-envelope"></i> Address</label>
+        <input type="text" style="width: 115px;" id="node-input-mmpAddress" placeholder="0xF0380000"
+        ><label id="node-input-mmpTypeLabel" for="node-input-mmpType" style="margin-left: 15px; width: 85px;"><i class="fa fa-tasks"></i> Type
+        </label><select type="text" id="node-input-mmpType" style="width: 85px;">
+            <option value="int8">INT8</option>
+            <option value="uint8">UINT8</option>
+            <option value="int32">INT32</option>
+            <option value="uint32">UINT32</option>
+            <option value="float">Float</option>
+            <option value="string">String</option>
+        </select>        
+    </div>
+    <div class="form-row hidden" id="mmpFields2">
+        <!-- FORMATTING NOTE: Avoid whitespace between inline-block elements by removing spaces
+            between the HTML elements. -->
+        <label for="node-input-mmpLength"><i class="fa fa-arrows-h"></i> Length</label>
+        <input type="text" style="width: 115px;" id="node-input-mmpLength"
+        ><label id="node-input-mmpEncodingLabel" for="node-input-mmpEncoding" style="margin-left: 15px; width: 85px;"><i class="fa fa-thumb-tack"></i> Encoding
+        </label><select type="text" id="node-input-mmpEncoding" style="width: 85px;">
+            <option value="ascii">ASCII</option>
+            <option value="utf8">UTF-8</option>
+        </select>        
+    </div>
+    <div class="form-row" id="valueRow">
+        <label for="node-input-value"><i class="fa fa-pencil"></i> Value</label>
+        <input type="text" id="node-input-value" style="width:300px">
+        <input type="hidden" id="node-input-valueType">
+    </div>
+    <div class="form-row">
+        <label for="node-input-name"><i class="fa fa-tag"></i> Node Name</label>
+        <input type="text" id="node-input-name" placeholder="Name">
+    </div>
+</script>
+
+<script type="text/x-red" data-template-name="groov-io-input">
+    <div class="form-row" id="pacAddressRow">
+        <label for="node-input-device"><i class="fa fa-globe"></i> Device</label>
+        <input type="text" id="node-input-device">
+    </div>
+    <div class="form-row" id="dataTypeRow">
+        <label for="node-input-dataType"><i class="fa fa-tasks"></i> Data Type</label>
+        <select type="text" id="node-input-dataType" style="width: 300px;">
+            <option value="channel-digital-state">Digital State Change</option>
+            <option value="channel-digital-turn-on">Digital Turned On</option>
+            <option value="channel-digital-turn-off">Digital Turned Off</option>
+            <option value="channel-digital-on-latch">Digital Input On-Latch</option>
+            <option value="channel-digital-off-latch">Digital Input Off-Latch</option>
+            <option value="channel-digital-feature-value">Digital Input Feature Value</option>
+            <option value="" disabled>————————————————</option>
+            <option value="channel-analog">Analog Channel Value</option>
+            <option value="" disabled>————————————————</option>
+            <option value="mmp-address">MMP Address</option>
+        </select>
+    </div>
+    <div class="form-row hidden" id="moduleAndChannelFields">
+        <!-- FORMATTING NOTE: Avoid whitespace between inline-block elements by removing spaces
+            between the HTML elements. -->
+        <label id="node-input-moduleIndexLabel"  for="node-input-moduleIndex" ><i class="fa fa-thumb-tack"></i> Module Index</label>
+        <input id="node-input-moduleIndex"       type="text" style="width: 75px;"
+        ><label id="node-input-channelIndexLabel" for="node-input-channelIndex"  style="margin-left: 25px; width: 125px;"><i class="fa fa-thumb-tack"></i> Channel Index
+        </label><input id="node-input-channelIndex"      type="text" style="width: 75px;"></input>
+    </div>
+    <div class="form-row hidden" id="mmpFields1">
+        <!-- FORMATTING NOTE: Avoid whitespace between inline-block elements by removing spaces
+            between the HTML elements. -->
+        <label for="node-input-mmpAddress"><i class="fa fa-envelope"></i> Address</label>
+        <input type="text" style="width: 115px;" id="node-input-mmpAddress" placeholder="0xF0380000"
+        ><label id="node-input-mmpTypeLabel" for="node-input-mmpType" style="margin-left: 15px; width: 85px;"><i class="fa fa-tasks"></i> Type
+        </label><select type="text" id="node-input-mmpType" style="width: 85px;">
+            <option value="int8">INT8</option>
+            <option value="uint8">UINT8</option>
+            <option value="int32">INT32</option>
+            <option value="uint32">UINT32</option>
+            <option value="float">Float</option>
+            <option value="string">String</option>
+        </select>        
+    </div>
+    <div class="form-row hidden" id="mmpFields2">
+        <!-- FORMATTING NOTE: Avoid whitespace between inline-block elements by removing spaces
+            between the HTML elements. -->
+        <label for="node-input-mmpLength"><i class="fa fa-arrows-h"></i> Length</label>
+        <input type="text" style="width: 115px;" id="node-input-mmpLength"
+        ><label id="node-input-mmpEncodingLabel" for="node-input-mmpEncoding" style="margin-left: 15px; width: 85px;"><i class="fa fa-thumb-tack"></i> Encoding
+        </label><select type="text" id="node-input-mmpEncoding" style="width: 85px;">
+            <option value="ascii">ASCII</option>
+            <option value="utf8">UTF-8</option>
+        </select>        
+    </div>
+    <div class="form-row hidden" id="deadbandRow">
+        <label for="node-input-deadband" ><i class="fa fa-crosshairs"></i> Deadband</label>
+        <input id ="node-input-deadband"       type="text" style="width: 75px;">
+    </div>
+    <div class="form-row" id="sendInitialValueRow">
+        <label>&nbsp;</label>
+        <input id ="node-input-sendInitialValue" type="checkbox"  style="display:inline-block; width:15px; vertical-align:baseline;">
+        <label for="node-input-sendInitialValue" style="width: 10em;">Send initial value</label>
+    </div>
+    <div class="form-row hidden" id="scanTimeRow">
+        <label for="node-input-scanTimeSec" ><i class="fa fa-thumb-tack"></i> Scantime</label>
+        <input id ="node-input-scanTimeSec" type="text" style="width: 75px;"> seconds
+    </div>
+    <p></p>
+    <div class="form-row">
+        <label for="node-input-name"><i class="fa fa-tag"></i> Node Name</label>
+        <input type="text" id="node-input-name" placeholder="Name">
+    </div>
+</script>
+
+<script type="text/x-red" data-template-name="groov-io-write">
+    <div class="form-row" id="pacAddressRow">
+        <label for="node-input-device"><i class="fa fa-globe"></i> Device</label>
+        <input type="text" id="node-input-device">
+    </div>
+    <div class="form-row" id="dataTypeRow">
+            <label for="node-input-dataType"><i class="fa fa-tasks"></i> Data Type</label>
+            <select type="text" id="node-input-dataType" style="width: 300px;">
+                <option value="channel-digital">Digital Output Channel State</option>
+                <option value="channel-clear-on-latch">Clear On-Latch</option>
+                <option value="channel-clear-off-latch">Clear Off-Latch</option>
+                <option value="channel-clear-feature-value">Clear Feature Value</option>
+                <option value="channel-counter-start">Start Counter</option>
+                <option value="channel-counter-stop">Stop Counter</option>
+                <option value="" disabled>————————————————</option>
+                <option value="channel-analog">Analog Channel Value</option>
+                <option value="channel-clear-min-value">Clear Maximum Value</option>
+                <option value="channel-clear-max-value">Clear Minimum Value</option>
+                <option value="" disabled>————————————————</option>
+                <option value="channel-config">Channel Configuration</option>
+                <option value="" disabled>————————————————</option>
+                <option value="mmp-address">MMP Address</option>
+            </select>
+        </div>
+        <div class="form-row hidden" id="moduleAndChannelFields">
+            <!-- FORMATTING NOTE: Avoid whitespace between inline-block elements by removing spaces
+                between the HTML elements. -->
+            <label id="node-input-moduleIndexLabel"  for="node-input-moduleIndex" ><i class="fa fa-thumb-tack"></i> Module Index</label>
+            <input id="node-input-moduleIndex"       type="text" style="width: 75px;"
+            ><label id="node-input-channelIndexLabel" for="node-input-channelIndex"  style="margin-left: 25px; width: 125px;"><i class="fa fa-thumb-tack"></i> Channel Index
+            </label><input id="node-input-channelIndex"      type="text" style="width: 75px;"></input>
+        </div>
+        <div class="form-row hidden" id="mmpFields1">
+            <!-- FORMATTING NOTE: Avoid whitespace between inline-block elements by removing spaces
+                between the HTML elements. -->
+            <label for="node-input-mmpAddress"><i class="fa fa-envelope"></i> Address</label>
+            <input type="text" style="width: 115px;" id="node-input-mmpAddress" placeholder="0xF0380000"
+            ><label id="node-input-mmpTypeLabel" for="node-input-mmpType" style="margin-left: 15px; width: 85px;"><i class="fa fa-tasks"></i> Type
+            </label><select type="text" id="node-input-mmpType" style="width: 85px;">
+                <option value="int8">INT8</option>
+                <option value="uint8">UINT8</option>
+                <option value="int32">INT32</option>
+                <option value="uint32">UINT32</option>
+                <option value="float">Float</option>
+                <option value="string">String</option>
+            </select>        
+        </div>
+        <div class="form-row hidden" id="mmpFields2">
+            <!-- FORMATTING NOTE: Avoid whitespace between inline-block elements by removing spaces
+                between the HTML elements. -->
+            <label id="node-input-mmpEncodingLabel" for="node-input-mmpEncoding"><i class="fa fa-thumb-tack"></i> Encoding
+            </label><select type="text" id="node-input-mmpEncoding" style="width: 85px;">
+                <option value="ascii">ASCII</option>
+                <option value="utf8">UTF-8</option>
+            </select>        
+        </div>
+        <div class="form-row" id="valueRow">
+            <label for="node-input-value"><i class="fa fa-pencil"></i> Value</label>
+            <input type="text" id="node-input-value" style="width:300px">
+            <input type="hidden" id="node-input-valueType">
+        </div>
+        <div class="form-row">
+            <label for="node-input-name"><i class="fa fa-tag"></i> Node Name</label>
+            <input type="text" id="node-input-name" placeholder="Name">
+        </div>
+    </script>
+
+<script type="text/x-red" data-template-name="groov-io-device">
+    <div class="form-row">
+        <label for="node-config-input-address" style="width: 110px"><i class="fa fa-globe"></i> Address</label>
+        <input type="text" id="node-config-input-address" placeholder="IP address">
+    </div>
+    <div class="form-row">
+        <label for="node-config-input-apiKey" style="width: 110px"><i class="fa fa-lock"></i> API Key</label>
+        <input type="password" autocomplete="off" id="node-config-input-apiKey" style="" placeholder="Value (secret)">
+    </div>
+    <div id="sslFields"> 
+        <div class="form-row" style="margin-bottom: 0px;" >
+            <label style="width: auto; margin-bottom: 2px:"><i class="fa fa-file-text"></i> SSL Certificates (PEM format)</label>
+        </div>
+        <div class="form-row">
+            <label for="node-config-input-caCertPath" style="width: 135px; text-align: right;"> CA or Self-Signed</label>
+            <input type="text" id="node-config-input-caCertPath" style="width: 65%" placeholder="Path to CA certificate">
+        </div>
+        <div class="form-row">
+            <label for="node-config-input-publicCertPath" style="width: 135px; text-align: right;"> Public Key</label>
+            <input type="text" id="node-config-input-publicCertPath" style="width: 65%" placeholder="Path to certificate (blank for self-signed)">
+        </div>
+    </div>
+    <hr/>
+    <div class="form-row">
+        <label for="node-config-input-msgQueueFullBehavior" style="width: auto"><i class="fa fa-align-justify"></i> When full, message queue should  </label>
+        <select type="text" id="node-config-input-msgQueueFullBehavior" style="width: auto">
+            <option value="REJECT_NEW">reject new</option>
+            <option value="DROP_OLD">drop old</option>
+        </select>
+        <span> messages.</span>
+    </div>
+</script>
+
+<script type="text/x-red" data-help-name="groov-io-device">
+    <p>Communication settings for <i>groov</i> EPIC processors.</p>
+    <h2>Basic Configuration</h2>
+    <p><b>Address</b> - the hostname or IP address for connecting to a <i>groov</i> EPIC processor.
+       Use "localhost" if using Node-RED on the same EPIC processor as the I/O.</p>
+    <p><b>API Key</b> - an API Key for one of the users on the EPIC processor.</p>
+    <h2>HTTPS Settings</h2>    
+    <p>Except for "localhost" addresses, the SSL Certificates  fields must also be configured.</p>
+    <p><b>CA or Self-Signed</b> - the full path or filename of either a Certificate Authority (CA) 
+        or self-signed certificate. Leave blank when address is "localhost".
+    </p>
+    <p><b>Public Key</b> - the full path or filename of the public key certificate. Leave this field 
+        blank if using a self-signed certificate.
+    </p>
+    <p>Whether the full path or just a filename is entered depends on where Node-RED is running.
+        <ul>
+            <li><b><i>groov</i> EPIC: </b>If using a <i>groov</i> EPIC processor to access another <i>groov</i>
+                EPIC processor, upload the certificates with <i>groov</i> Manage, using the
+                Security -> Client SSL page. Enter just the filenames here.
+            </li>
+            <li><b><i>groov</i> Box: </b>If using a GROOV-AR1 to access a <i>groov</i> EPIC processor, upload
+                the certificates with Node-RED Admin. Enter just the filenames here.
+            </li>
+            <li><b>Computer: </b>If using Node-RED on a computer, enter the path and filenames of 
+                the certificates, which must be located on the same computer. They will be loaded 
+                directly from the local file system.
+            </li>
+        </ul>
+    <p>The certificates must be in PEM format.</p>
+    <h2>Message Queue</h2>
+    <p>The Read and Write nodes use a shared message queue. One message will be processed at a time.
+       The message queue helps to throttle communcation to the EPIC processor and prevents unlimited memory
+       growth when a device is disconnected.
+    </p>
+    <p>If the queue fills up with message, it can either <b>reject new</b> or <b>drop old</b> messages.
+    </p>
+</script>
+
+<script type="text/x-red" data-help-name="groov-io-input">
+    <p>Poll the I/O of a <i>groov</i> EPIC processor and produce messages when values change.</p>
+    <h2>Outputs</h2>
+        <dl class="message-properties">
+            <dt>payload <span class="property-type">boolean | number | string | array</span></dt>
+            <dd> The value read for the given type. Details for each value type are below.</dd>
+            <dt>body <span class="property-type">object</span></dt>
+            <dd> The full response for the underlying REST API call. May include additional information than the main value in the payload.</dd>
+        </dl>
+    <h2>Basic Usage</h2>
+    <p>Various type of values can be polled:</p>
+    <ul>
+        <li><b>Digital State Change:</b> a message is sent when the digital channel's state changes, with the payload set to <code>true</code> or <code>false</code>.</li>
+        <li><b>Digital Turned On:</b> a message is sent when the digital channel is turned on, with the payload set to <code>true</code>.</li>
+        <li><b>Digital Turned Off:</b> a message is sent when the digital channel is turned off, with the payload set to <code>false</code>.</li>
+        <li><b>Digital Input On-Latch:</b> a message is sent when the digital input channel's on-latch is set, with the payload set to <code>true</code>.</li>
+        <li><b>Digital Input Off-Latch:</b> a message is sent when the digital input channel's on-latch is set, with the payload set to <code>true</code>.</li>
+        <li><b>Digital Input Feature Value:</b> a message is sent when the digital input channel's feature value changes, with the payload set to the new value.</li>
+        <li><b>Analog Channel Value:</b> a message is sent when the analog channel's value changes, with the payload set to the new value.</li>
+        <li><b>MMP Address:</b> a message is sent when the value at the given OptoMMP memory map address changes, with the payload set to the new value. An array is returned when reading more than one numeric element. Otherwise, a single value is returned.</li>
+    </ul>
+    <p>For most types, a <b>Module Index</b> and a <b>Channel Index</b> need to be provided. The indexes are zero-based.
+       Missing or invalid indexes will result in 0 being used. No range checking is performed by the node.
+    </p>
+    <p>For numeric values, the <b>Deadband</b> setting controls the generation of new messages. A message is
+       only generated if the new value is beyond the deadband compared to the previous sent value 
+       (or the initial value if just starting up).
+    </p>
+    <p>When the <b>Send initial value</b> is selected, the node will send a message with the first value.
+       This is useful when needing to capture the current value rather than wait for a value to change before a message
+       is sent.
+    </p>
+    <p>When reading a generic MMP address, you must also provide:</p>
+    <ul>
+        <li><b>Address</b>: the MMP address, in hexadecimal format (e.g. 0xF0D81000).  </li>
+        <li><b>Type</b>: The type of data to read (INT8, UINT8, INT32, UINT32, Float, or String) </li>
+        <li><b>Length</b>: For numbers, this is the number of elements to read. It must be 256 or less. For a string, this is the number of bytes to read, and must be 1024 or less.</li>
+        <li><b>Endcoding</b>: The expected encoding of the string. This should match the encoding that was used to write
+            the value.</li>
+    </ul>
+    <h2>Error Handling</h2>
+        <p>If an error occurs, an error will be thrown that can be caught with a Catch node. No output
+            message will be sent.
+        </p>
+        <p>The message sent to the Catch node will have <u>one</u> of the following properties:
+        </p>
+        <ul>
+            <li><code>msg.groovError</code>, with the following properties:</li>
+                <ul>
+                    <li><code>message</code> - a string describing the error</li>
+                </ul>
+            <li><code>msg.resError</code>, with the following properties:</li>
+                <ul>
+                    <li><code>statusCode</code> - the HTTP status code as a number.</li>
+                    <li><code>body</code> - the body of the response.</li>
+                </ul>
+            <li><code>msg.reqError</code> - an object returned from the HTTP library.</li>
+        </ul>
+</script>
+
+<script type="text/x-red" data-help-name="groov-io-read">
+    <p>Read values from <i>groov</i> I/O.</p>
+    <h2>Basic Usage</h2>
+    <p>Various types of values can be read:</p>
+    <ul>
+        <li><b>Digital Channel:</b> returns the digital channel's state as a boolean. Other channel information is returned in the <code>msg.body</code>.</li>
+        <li><b>Analog Channel:</b> returns the analog channel's value as a number. Other channel information is returned in the <code>msg.body</code>.</li>
+        <li><b>Channel Configuration:</b> returns the channel's configuration.</li>
+        <li><b>Digital Module Values:</b> returns an array of objects describing all the digital channels on a module.</li>
+        <li><b>Analog Module Values:</b> returns an array of objects describing all the analog channels on a module.</li>
+        <li><b>All Modules - Quality Flags:</b> returns a bitmask representing the quality flags for all the module slots on the rack.</b> </li>
+        <li><b>MMP Address:</b> returns the value at the given OptoMMP memory map address. An array is returned when reading more than one numeric element. Otherwise, a single value is returned.</li>
+    </ul>
+    <p>For most types, a <b>Module Index</b> and a <b>Channel Index</b> need to be provided. The indexes are zero-based.
+       Missing or invalid indexes will result in 0 being used. No range checking is performed by the node.
+    </p>
+    <p>When reading a generic MMP address, you must also provide:</p>
+    <ul>
+        <li><b>Address</b>: the MMP address, in hexadecimal format (e.g. 0xF0D81000).  </li>
+        <li><b>Type</b>: The type of data to read (INT8, UINT8, INT32, UINT32, Float, or String) </li>
+        <li><b>Length</b>: For numbers, this is the number of elements to read. It must be 256 or less. For a string, this is the number of bytes to read, and must be 1024 or less.</li>
+        <li><b>Endcoding</b>: The expected encoding of the string. This should match the encoding that was used to write
+            the value.</li>
+    </ul>
+    <h2>Returned Values</h2>
+    <p>By default, the result is placed in <code>msg.payload</code>. 
+       The result may also be placed into any property on the <code>msg</code> object.</p>
+    <p>The full response will be placed in <code>msg.body</code>.
+       This may include additional information than the main value in the payload.
+       The responses are defined by the <a href="http://developer.opto22.com/groov/manage/"><i>groov</i> Manage REST API</a>.
+    </p>
+    <h2>Dynamic Settings</h2>
+        <p>If the incoming message has any of the following properties, then they
+           will be used over any settings in the node itself.
+        </p> 
+        <p><code>msg.moduleIndex</code> - a number for a module's index (0-15).</p>
+        <p><code>msg.channelIndex</code> - a number for a channel's index (0-31).</p>
+        <p><code>msg.mmpAddress</code> - a string representing an MMP address in hexadecimal form (e.g. '0xF0D81000').</p>
+    <h2>Error Handling</h2>
+        <p>If an error occurs, an error will be thrown that can be caught with a Catch node. No output
+            message will be sent, so the flow will not continue.
+        </p>
+        <p>The message sent to the Catch node will have <u>one</u> of the following properties:
+        </p>
+        <ul>
+            <li><code>msg.groovError</code>, with the following properties:</li>
+                <ul>
+                    <li><code>message</code> - a string describing the error</li>
+                </ul>
+            <li><code>msg.resError</code>, with the following properties:</li>
+                <ul>
+                    <li><code>statusCode</code> - the HTTP status code as a number.</li>
+                    <li><code>body</code> - the body of the response.</li>
+                </ul>
+            <li><code>msg.reqError</code> - an object returned from the HTTP library.</li>
+        </ul>
+</script>
+
+<script type="text/x-red" data-help-name="groov-io-write">
+    <p>Write values to <i>groov</i> I/O.</p>
+    <h2>Basic Usage</h2>
+    <p>Various types of values can be written:</p>
+    <ul>
+        <li><b>Digital Output Channel State:</b> turn a digital output channel on of off.</li>
+            <ul>
+                <li>To turn on the channel, the value should be a boolean <code>true</code>, or the strings 'true' or 'on'.</li>
+                <li>To turn off the channel, the value should be a boolean <code>false</code>, or the strings 'false' or 'off'.</li>
+            </ul>
+        <li><b>Clear On-Latch:</b> clear a digital input channel's on-latch flag.</li>
+        <li><b>Clear Off-Latch:</b> clear a digital input channel's off-latch flag.</li>
+        <li><b>Clear Feature Value:</b> clear a digital input channel's feature value.</li>
+        <li><b>Start Counter:</b> start a digital input channel's counter.</li>
+        <li><b>Stop Counter:</b> stop a digital input channel's counter.</li>
+        <li><b>Analog Channel Value:</b> set an analog output channel's value.</li>
+            <ul>
+                <li>The value to write should be either a number or a string that is parsable as a number.</li>
+            </ul>        
+        <li><b>Clear Maximum Value:</b> clear an analog input channel's maximum value.</li>
+        <li><b>Clear Minimum Value:</b> clear an analog input channel's minimum value.</li>
+        <li><b>Channel Configuration:</b> configure a channel.</li>
+        <li><b>MMP Address:</b> write a value to an OptoMMP memory map address.</li>
+            <ul>
+                <li>For numeric types, the value should be a number. For the string type, the value should be a string.</li>
+            </ul>        
+    </ul>
+    <p>For most types, a <b>Module Index</b> and a <b>Channel Index</b> need to be provided. The indexes are zero-based.
+        Missing or invalid indexes will result in 0 being used. No range checking is performed by the node.
+     </p>
+     <p>When writing to a generic MMP address, you must also provide:</p>
+     <ul>
+         <li><b>Address</b>: the MMP address, in hexadecimal format (e.g. 0xF0D81000).  </li>
+         <li><b>Type</b>: The type of data to write (INT8, UINT8, INT32, UINT32, Float, or String) </li>
+         <li><b>Endcoding</b>: The encoding used to write the string. This should match the encoding that is used to read
+             the string in other software.</li>
+     </ul>
+     <h2>Value to Write - Overview</h2>
+     <p>The <b>value</b> can either come from a property on the incoming message (including <code>msg.payload</code> or
+        a custom property on <code>msg</code>) or as entered in the Value field. The details are
+        listed above.</p>
+     <h2>Dynamic Settings</h2>
+        <p>If the incoming message has any of the following properties, then they
+           will be used over any settings in the node itself.
+        </p> 
+        <p><code>msg.moduleIndex</code> - a number for a module's index (0-15).</p>
+        <p><code>msg.channelIndex</code> - a number for a channel's index (0-31).</p>
+        <p><code>msg.mmpAddress</code> - a string representing an MMP address in hexadecimal form (e.g. '0xF0D81000').</p>
+    <h2>Error Handling</h2>
+        <p>If an error occurs, an error will be thrown that can be caught with a Catch node. No output
+            message will be sent, so the flow will not continue.
+        </p>
+        <p>The message sent to the Catch node will have <u>one</u> of the following properties:
+        </p>
+        <ul>
+            <li><code>msg.groovError</code>, with the following properties:</li>
+                <ul>
+                    <li><code>message</code> - a string describing the error</li>
+                </ul>
+            <li><code>msg.resError</code>, with the following properties:</li>
+                <ul>
+                    <li><code>statusCode</code> - the HTTP status code as a number.</li>
+                    <li><code>body</code> - the body of the response.</li>
+                </ul>
+            <li><code>msg.reqError</code> - an object returned from the HTTP library.</li>
+        </ul>
+</script>
