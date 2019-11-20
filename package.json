@@ -42,7 +42,6 @@
     "grunt-mocha-istanbul": "5.0.2",
     "grunt-contrib-watch": "1.1.0",
     "grunt-shell": "3.0.1",
-    "grunt-wget": "git+https://github.com/jakejuby/grunt-wget",
     "mocha": "6.0.0",
     "should": "13.2.3",
     "sinon": "7.3.0",

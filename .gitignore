@@ -2,7 +2,6 @@ node_modules/
 build/
 package/
 coverage/
-tools/
 *.tgz
 /.project
 /log.txt

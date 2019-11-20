@@ -120,15 +120,9 @@ module.exports = function(grunt) {
       */
       'swagger-codegen-manage-public-lib':
         'java -jar tools/swagger-codegen-cli-2.4.2.jar generate -i src/swagger/spec/manage-api-public.yaml -l typescript-node -o src/swagger/lib  -t src/swagger/codegen/api.typescript-request.mustache',
-    },    
-    wget: {
-      "swagger-codegen": {
-        files: {
-          'tools/swagger-codegen-cli-2.4.2.jar':
-          'http://repo1.maven.org/maven2/io/swagger/swagger-codegen-cli/2.4.2/swagger-codegen-cli-2.4.2.jar'
-        }
-      },
-    },    
+      'wget-swagger-codegen':
+        'wget -O tools/swagger-codegen-cli-2.4.2.jar http://repo1.maven.org/maven2/io/swagger/swagger-codegen-cli/2.4.2/swagger-codegen-cli-2.4.2.jar'
+    },
   });
 
   grunt.loadNpmTasks("grunt-contrib-watch");
@@ -139,7 +133,6 @@ module.exports = function(grunt) {
   grunt.loadNpmTasks('grunt-shell');  
   grunt.loadNpmTasks("grunt-simple-mocha");
   grunt.loadNpmTasks('grunt-mocha-istanbul')
-  grunt.loadNpmTasks('grunt-wget');
 
   grunt.registerTask("default", ["clean:build", "copy:build", "ts:client"]);
 
@@ -147,7 +140,7 @@ module.exports = function(grunt) {
   grunt.registerTask("test", 'comment', ['default', 'ts:test', 'copy:testSettings', 'mocha_istanbul:default']);
   grunt.registerTask("mocha", 'comment', ['copy:testSettings', 'mocha_istanbul:default']);
 
-  grunt.registerTask("swagger-api", ["shell:swagger-codegen-manage-public-lib"]);
+  grunt.registerTask("swagger-api", ["shell:wget-swagger-codegen","shell:swagger-codegen-manage-public-lib"]);
 
   grunt.registerTask("package", 'comment', ['clean:package', 'default', 'copy:package', 'npm-command:pack']);
 };
