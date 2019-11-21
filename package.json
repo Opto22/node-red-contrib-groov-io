@@ -14,7 +14,7 @@
     "build": "grunt"
   },
   "dependencies": {
-    "opto22-node-red-common": "1.0.4",
+    "opto22-node-red-common": "1.0.5",
     "simple-node-logger": "18.12.22",
     "request": "2.88.0",
     "bluebird": "3.5.3",
@@ -47,7 +47,7 @@
     "sinon": "7.3.0",
     "typescript": "3.3.3",
     "typescript-formatter": "7.2.2",
-    "node-red": "0.19.5",
+    "node-red": "1.0.2",
     "swagger-typescript-codegen": "1.9.3",
     "js-yaml": "3.13.1"
   },
