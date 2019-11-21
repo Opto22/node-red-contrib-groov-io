@@ -111,7 +111,7 @@ export class WriteNodeImpl extends FunctionNodeBaseImpl {
 
             this.node.error(errorMessage, msg);
             this.node.status({ fill: "red", shape: "dot", text: "error" });
-            //this.msgQueue.done(0);
+            this.msgQueue.done(0);
             return;
         }
 
