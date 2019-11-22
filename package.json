@@ -1,14 +1,11 @@
 {
   "name": "node-red-contrib-groov-io",
-  "version": "0.0.9-beta.4",
+  "version": "0.0.9-beta.5",
   "description": "Node-RED nodes for groov I/O",
   "homepage": "http://developer.opto22.com/nodered/groov-io/",
   "license": "Apache-2.0",
   "engines": {
     "node": ">=6.10.3"
-  },
-  "publishConfig": {
-    "registry": "https://artifactory.opto22.com/artifactory/api/npm/npm-snapshot-local/"
   },
   "scripts": {
     "build": "grunt"
