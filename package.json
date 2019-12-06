@@ -1,6 +1,6 @@
 {
   "name": "node-red-contrib-groov-io",
-  "version": "0.0.9-beta.5",
+  "version": "1.0.0",
   "description": "Node-RED nodes for groov I/O",
   "homepage": "http://developer.opto22.com/nodered/groov-io/",
   "license": "Apache-2.0",
