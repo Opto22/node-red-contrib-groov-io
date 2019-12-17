@@ -379,6 +379,76 @@ describe('Groov I/O Write Nodes', function () {
                 done);
         });
 
+        it('can clear min and max values', function (done) {
+            this.timeout(12000);
+            var channelIndex = 3;
+            const nodeConfig = {
+                dataType: 'channel-clear-max-value',
+                moduleIndex: RackInfo.ao.index.toString(),
+                channelIndex: channelIndex.toString()
+            };
+
+            async.series([
+                // Use the client lib to set value to 0
+                (next: (err?: Error) => void) => {
+                    TestUtil.setAnalogOutput(RackInfo.ao.index, channelIndex, 0.0, next);
+                },
+                // Use the client lib to set value to 10
+                (next: (err?: Error) => void) => {
+                    TestUtil.setAnalogOutput(RackInfo.ao.index, channelIndex, 10.0, next);
+                },
+                // Use the client lib to set value to 5
+                (next: (err?: Error) => void) => {
+                    TestUtil.setAnalogOutput(RackInfo.ao.index, channelIndex, 5.0, next);
+                },
+                // Use the Write node to Clear the Maximum value
+                (next: (err?: Error) => void) => {
+                    TestUtil.testWriteNode(deviceConfigNode.id,
+                        {
+                            dataType: 'channel-clear-max-value',
+                            moduleIndex: RackInfo.ai.index.toString(),
+                            channelIndex: channelIndex.toString()
+                        },
+                        {
+                            payload: 0 // doesn't matter
+                        },
+                        (msg: any) => {
+                            next();
+                        });
+                },
+                // Use the Write node to Clear the Minimum value
+                (next: (err?: Error) => void) => {
+                    TestUtil.testWriteNode(deviceConfigNode.id,
+                        {
+                            dataType: 'channel-clear-min-value',
+                            moduleIndex: RackInfo.ai.index.toString(),
+                            channelIndex: channelIndex.toString()
+                        },
+                        {
+                            payload: 0 // doesn't matter
+                        },
+                        (msg: any) => {
+                            next();
+                        });
+                },
+                (next: () => void) => { setTimeout(next, 500); },
+                // Read the input and test
+                (next: (err?: Error) => void) => {
+                    TestUtil.getAnalogInput(RackInfo.ai.index, channelIndex,
+                        (err: any, value?: number, fullModel?: ApiLib.AnalogChannelRead) => {
+                            if (err) { next(err); return; }
+                            should(value).be.approximately(5.0, 0.1);
+                            should(fullModel.minValue).be.approximately(5.0, 0.1);
+                            should(fullModel.maxValue).be.approximately(5.0, 0.1);
+                            next();
+                        });
+                },
+            ],
+                done);
+        });
+
+
+
     });
 
     describe('MMP Addresses', function () {
@@ -752,6 +822,6 @@ describe('Groov I/O Write Nodes', function () {
             should(stringValueToWriteValue(dataType, ' -1234.5678  ', 'int32')).be.eql(-1234);
             should(stringValueToWriteValue(dataType, ' -1234.5678  ', 'float')).be.eql(-1234.5678);
             should(stringValueToWriteValue(dataType, '12.3e-45', 'float')).be.eql(1.23e-44);
-        });        
+        });
     });
 });

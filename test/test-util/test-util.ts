@@ -380,11 +380,11 @@ export function setMmpValue(mmpAddress: string, value: number | string,
 }
 
 export function getAnalogInput(outModuleIndex: number, channelIndex: number,
-    done: (err: any, value?: number) => void) {
+    done: (err: any, value?: number, fullModel?: ApiLib.AnalogChannelRead) => void) {
     ClientTestUtil.sharedApiClient.getChannelAnalogStatus('local', outModuleIndex, channelIndex)
         .then(
             (fulfilledResponse: { response: http.ClientResponse; body: ApiLib.AnalogChannelRead }) => {
-                done(undefined, fulfilledResponse.body.value);
+                done(undefined, fulfilledResponse.body.value, fulfilledResponse.body);
             },
             done // pass back any errors
         );
