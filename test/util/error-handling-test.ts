@@ -117,19 +117,29 @@ describe('Error Handling', function () {
                 },
                 (errorText: string, nodeMsg: any) => {
                     // Check that the error was sent to the node.
-                    should(errorSpy.firstCall.args[0]).be.eql('Bad API key or server error. HTTP response error : 500');
 
-                    
+                    should(errorSpy.firstCall.args[0]).be.oneOf([
+                        'Bad API key or server error. HTTP response error : 500', // Auth v1
+                        'Bad API key. HTTP response error : 401' // Auth v2
+                    ]);
+
+
                     // Confirm the REQUEST error
-                    should(errorSpy.firstCall.args[1].resError.statusCode).be.equal(500);
+                    should(errorSpy.firstCall.args[1].resError.statusCode).be.oneOf([401, 500]);
                     should(errorSpy.firstCall.args[1].resError.body).be.a.type('string');
 
                     // Check that the node's status was set.
-                    should(node.getStatus()).match({
-                        fill: "red",
-                        shape: "dot",
-                        text: 'Bad API key or server error' // Yes, the Auth service is returning a 500, not a 403.
-                    });
+                    should(node.getStatus()).be.oneOf([
+                        {
+                            fill: "red",
+                            shape: "dot",
+                            text: 'Bad API key or server error' // Yes, the Auth v1 service is returning a 500, not a 401.
+                        },
+                        {
+                            fill: "red",
+                            shape: "dot",
+                            text: 'Bad API key'
+                        }]);
 
                     errorSpy.restore();
                     statusSpy.restore();
@@ -170,7 +180,7 @@ describe('Error Handling', function () {
                 (errorText: string, nodeMsg: any) => {
                     // Check that the error was sent to the node.
                     should(errorSpy.firstCall.args[0]).be.eql('Address not found. Error code: ENOTFOUND from system call "getaddrinfo"');
-                    
+
                     // Confirm the REQUEST error
                     should(errorSpy.firstCall.args[1].reqError).be.match({
                         "code": "ENOTFOUND",
