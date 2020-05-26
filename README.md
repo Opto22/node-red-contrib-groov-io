@@ -27,6 +27,6 @@ There are three types of nodes available:
 
 ## Copyright and License
 
-Copyright 2019 Opto 22
+Copyright 2019-2020 Opto 22
 
 Licensed under the Apache 2.0 license.
