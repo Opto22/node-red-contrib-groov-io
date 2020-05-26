@@ -552,11 +552,11 @@
 </script>
 
 <script type="text/x-red" data-help-name="groov-io-device">
-    <p>Communication settings for <i>groov</i> EPIC processors.</p>
+    <p>Communication settings for <i>groov</i> EPIC processors and RIO modules. <b>JIM WAS HERE!!</b></p>
     <h2>Basic Configuration</h2>
-    <p><b>Address</b> - the hostname or IP address for connecting to a <i>groov</i> EPIC processor.
-       Use "localhost" if using Node-RED on the same EPIC processor as the I/O.</p>
-    <p><b>API Key</b> - an API Key for one of the users on the EPIC processor.</p>
+    <p><b>Address</b> - the hostname or IP address for connecting to a <i>groov</i> EPIC processor or RIO module.
+       Use "localhost" if using Node-RED on the same <i>groov</i> device as the I/O.</p>
+    <p><b>API Key</b> - an API Key for one of the users on the <i>groov</i> device.</p>
     <h2>HTTPS Settings</h2>    
     <p>Except for "localhost" addresses, the SSL Certificate field must also be configured.</p>
     <p><b>CA or Self-Signed</b> - the full path or filename of either a Certificate Authority (CA) 
@@ -565,7 +565,7 @@
     <p>Whether the full path or just a filename is entered depends on where Node-RED is running.
         <ul>
             <li><b><i>groov</i> EPIC: </b>If using a <i>groov</i> EPIC processor to access another <i>groov</i>
-                EPIC processor, upload the certificate with <i>groov</i> Manage, using the
+                EPIC processor or RIO module, upload the certificate with <i>groov</i> Manage, using the
                 Security -> Client SSL page. Enter just the filename here.
             </li>
             <li><b><i>groov</i> RIO: </b>If using a <i>groov</i> RIO module to access another <i>groov</i> RIO module
@@ -573,7 +573,7 @@
                 using the Security -> Client SSL page. That will import the certificate into the system's
                 CA store. Nothing needs to be entered.
             </li>  
-            <li><b><i>groov</i> Box: </b>If using a GROOV-AR1 to access a <i>groov</i> EPIC processor, upload
+            <li><b><i>groov</i> Box: </b>If using a GROOV-AR1 to access a <i>groov</i> EPIC processor or RIO module, upload
                 the certificate with Node-RED Admin. Enter just the filename here.
             </li>
             <li><b>Computer: </b>If using Node-RED on a computer, enter the path and filename of 
@@ -584,7 +584,7 @@
     <p>The certificate must be in PEM format.</p>
     <h2>Message Queue</h2>
     <p>The Read and Write nodes use a shared message queue. One message will be processed at a time.
-       The message queue helps to throttle communcation to the EPIC processor and prevents unlimited memory
+       The message queue helps to throttle communcation to the EPIC processor or RIO module and prevents unlimited memory
        growth when a device is disconnected.
     </p>
     <p>If the queue fills up with message, it can either <b>reject new</b> or <b>drop old</b> messages.
@@ -592,7 +592,7 @@
 </script>
 
 <script type="text/x-red" data-help-name="groov-io-input">
-    <p>Poll the I/O of a <i>groov</i> EPIC processor and produce messages when values change.</p>
+    <p>Poll the I/O of a <i>groov</i> EPIC processor or RIO module and produce messages when values change.</p>
     <h2>Outputs</h2>
         <dl class="message-properties">
             <dt>payload <span class="property-type">boolean | number | string | array</span></dt>
