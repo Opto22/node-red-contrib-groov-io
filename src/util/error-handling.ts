@@ -51,6 +51,7 @@ export class ResponseErrorMessages {
 
         // SSL errors
         'DEPTH_ZERO_SELF_SIGNED_CERT': 'Problem with the security certificate',
+        'ERR_TLS_CERT_ALTNAME_INVALID': "Address doesn't match certificate"
     };
 
     /**
