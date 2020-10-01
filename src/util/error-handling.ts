@@ -81,7 +81,7 @@ export class ResponseErrorMessages {
                         error.code;
                 }
                 else {
-                    longError = shortError + '. Error code: ' + error.code + ' ' + error;
+                    longError = shortError + '. Error code: ' + error.code;
                 }
             }
 
