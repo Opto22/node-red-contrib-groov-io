@@ -1,5 +1,9 @@
 # Node-RED for groov I/O
 
+### 1.0.3
+
+ * Improved error messages for a few common certificate problems.
+
 ### 1.0.2
 
 May 27, 2020
