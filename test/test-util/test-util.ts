@@ -1,7 +1,7 @@
 import * as NodeHandlers from "../../src/nodes/base-node";
 import * as ConfigHandler from "../../src/nodes/config-node";
-import * as NodeRed from 'opto22-node-red-common/typings/nodered';
-import * as MockRed from "opto22-node-red-common/lib/mocks/MockRed";
+import * as NodeRed from '../../submodules/opto22-node-red-common/typings/nodered';
+import * as MockRed from "../../submodules/opto22-node-red-common/src/mocks/MockRed";
 import { NodeWriteConfiguration, createWriteNode } from '../../src/nodes/write-node';
 import { InputNodeImpl, NodeInputConfiguration, createInputNode } from "../../src/nodes/input-node";
 import { WriteNodeImpl } from "../../src/nodes/write-node";
@@ -15,7 +15,7 @@ import { MockGroovReadNode, MockGroovWriteNode, MockGroovInputNode, MockNodeEx }
 import { MockGroovIoDeviceNode } from "./mock-groov-io-nodes";
 import * as async from 'async';
 import * as http from 'http';
-import { MockNode } from "opto22-node-red-common/lib/mocks/MockNode";
+import { MockNode } from "../../submodules/opto22-node-red-common/src/mocks/MockNode";
 import { visitFunctionBody } from "typescript";
 var TestSettings = require('../settings.json');
 

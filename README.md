@@ -25,6 +25,10 @@ There are three types of nodes available:
 
  For more detailed information, see the [online documentation](http://developer.opto22.com/nodered/groov-io).
 
+## Cloning the Repo
+
+When cloning the repo, be sure to use the "--recursive" switch to get any Git Submodules.
+
 ## Copyright and License
 
 Copyright 2019-2020 Opto 22

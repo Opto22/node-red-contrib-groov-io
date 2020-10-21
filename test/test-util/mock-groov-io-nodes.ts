@@ -1,4 +1,4 @@
-import { MockNode } from 'opto22-node-red-common/lib/mocks/MockNode';
+import { MockNode } from '../../submodules/opto22-node-red-common/src/mocks/MockNode';
 import * as ConfigHandler from "../../src/nodes/config-node";
 import * as NodeHandlers from "../../src/nodes/base-node";
 import { WriteNodeImpl } from '../../src/nodes/write-node';

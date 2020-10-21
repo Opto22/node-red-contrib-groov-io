@@ -19,10 +19,10 @@ import * as ConfigHandler from "./config-node";
 
 // Import external modules
 import http = require('http');
-import * as NodeRed from 'opto22-node-red-common/typings/nodered';
+import * as NodeRed from '../../submodules/opto22-node-red-common/typings/nodered';
 import Promise = require('bluebird');
 import { DefaultApi } from "../swagger/lib/api";
-import MessageQueue from "opto22-node-red-common/lib/MessageQueue";
+import MessageQueue from "../../submodules/opto22-node-red-common/src/MessageQueue";
 import { ErrorDetails } from "../util/error-handling";
 
 export type MmpDataType =  'int8' | 'uint8' |'int32' | 'uint32' | 'float' | 'string';

@@ -16,7 +16,7 @@
 
 import * as NodeHandlers from "./nodes/base-node";
 import * as ConfigHandler from "./nodes/config-node";
-import * as NodeRed from 'opto22-node-red-common/typings/nodered';
+import * as NodeRed from '../submodules/opto22-node-red-common/typings/nodered/index';
 import semver = require('semver');
 import * as InputNodeHandler from "./nodes/input-node";
 import * as ReadNodeHandler from "./nodes/read-node";
