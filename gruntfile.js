@@ -6,7 +6,7 @@ module.exports = function(grunt) {
           src: [
             "src/**/*.ts",
             "node_modules/@opto22/node-red-utils/typings/*.d.ts"],
-          dest: "build/src"
+          dest: "build"
         }],
         options: {
           module: "commonjs",
