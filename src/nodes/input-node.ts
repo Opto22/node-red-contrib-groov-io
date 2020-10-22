@@ -25,7 +25,7 @@ import Promise = require('bluebird');
 import * as ErrorHanding from "../util/error-handling";
 import { NodeBaseImpl, NodeBaseConfiguration, PromiseResponse } from "./base-node";
 import { ENGINE_METHOD_NONE } from "constants";
-import { InputNodeScanner, InputNodeChangeType } from "./InputNodeScanner";
+import { InputNodeScanner, InputNodeChangeType } from "../../submodules/opto22-node-red-common/src/InputNodeScanner";
 
 var RED: NodeRed.RED;
 

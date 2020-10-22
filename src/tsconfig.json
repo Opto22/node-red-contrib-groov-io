@@ -10,6 +10,6 @@
         "outDir": "../build"
     },
     "include": [
-      "**/*.ts"
+      "**/*.ts", "../submodules/opto22-node-red-common/src/InputNodeScanner.ts"
     ]
 }
