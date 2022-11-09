@@ -8,6 +8,8 @@ import * as assert from 'assert';
 import * as Promise from 'bluebird';
 import * as http from 'http';
 import { ResponseErrorMessages, StatusCodeMessages, handleErrorResponse } from '../../src/util/error-handling';
+import * as process from 'process';
+import * as SemVer from 'semver';
 
 
 describe('Error Handling', function () {
@@ -181,16 +183,28 @@ describe('Error Handling', function () {
                     // Check that the error was sent to the node.
                     should(errorSpy.firstCall.args[0]).be.eql('Address not found. Error code: ENOTFOUND from system call "getaddrinfo"');
 
+                    // Node keeps changing the error object.
+                    var expectedError = SemVer.gte(process.version, '14.0.0') ?
+                        {
+                            "code": "ENOTFOUND",
+                            "errno": -3008, // this changed in 13.0.0 (https://github.com/nodejs/node/pull/28140)
+                            "syscall": "getaddrinfo",
+                            "hostname": "999.999.999.999",
+                            "message": "getaddrinfo ENOTFOUND 999.999.999.999"
+                        }
+                        :
+                        {
+                            "code": "ENOTFOUND",
+                            "errno": "ENOTFOUND",
+                            "syscall": "getaddrinfo",
+                            "hostname": "999.999.999.999",
+                            "host": "999.999.999.999",
+                            "port": 443,
+                            "message": "getaddrinfo ENOTFOUND 999.999.999.999 999.999.999.999:443"
+                        };
+
                     // Confirm the REQUEST error
-                    should(errorSpy.firstCall.args[1].reqError).be.match({
-                        "code": "ENOTFOUND",
-                        "errno": "ENOTFOUND",
-                        "syscall": "getaddrinfo",
-                        "hostname": "999.999.999.999",
-                        "host": "999.999.999.999",
-                        "port": 443,
-                        "message": "getaddrinfo ENOTFOUND 999.999.999.999 999.999.999.999:443"
-                    });
+                    should(errorSpy.firstCall.args[1].reqError).be.match(expectedError);
 
                     // Check that the node's status was set.
                     should(node.getStatus()).match({
