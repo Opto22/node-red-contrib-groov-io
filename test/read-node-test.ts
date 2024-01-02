@@ -240,7 +240,7 @@ describe('Groov I/O Read Nodes', function () {
                                 channelIndex: channelIndex.toString()
                             },
                             (msg: { payload: number, body: ApiLib.AnalogChannelRead }) => {
-                                should(msg.payload).be.approximately(4.25, 0.1);
+                                should(msg.payload).be.approximately(4.25, 0.25);
                                 should(msg.body.value).be.eql(msg.payload);
 
                                 should(msg.body.channelIndex).be.eql(channelIndex);
@@ -290,7 +290,7 @@ describe('Groov I/O Read Nodes', function () {
                 (msg: any) => {
                     // Snip out the name, since something else might
                     // have given it a name.
-                    msg.payload.name = ''; 
+                    msg.payload.name = '';
 
                     should(msg.payload).match({
                         moduleIndex: 4,

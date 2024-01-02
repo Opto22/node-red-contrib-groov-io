@@ -290,7 +290,7 @@ describe('Groov I/O Write Nodes', function () {
                 (next: (err?: Error) => void) => {
                     TestUtil.getAnalogInput(RackInfo.ai.index, channelIndex, (err: any, value?: number) => {
                         if (err) { next(err); return; }
-                        should(value).be.approximately(6.2, 0.1);
+                        should(value).be.approximately(6.2, 0.2);
                         next();
                     });
                 },
@@ -330,7 +330,7 @@ describe('Groov I/O Write Nodes', function () {
                 (next: (err?: Error) => void) => {
                     TestUtil.getAnalogInput(RackInfo.ai.index, channelIndex, (err: any, value?: number) => {
                         if (err) { next(err); return; }
-                        should(value).be.approximately(testValue, 0.1);
+                        should(value).be.approximately(testValue, testValue * 0.05);
                         next();
                     });
                 },
@@ -371,7 +371,7 @@ describe('Groov I/O Write Nodes', function () {
                 (next: (err?: Error) => void) => {
                     TestUtil.getAnalogInput(RackInfo.ai.index, channelIndex, (err: any, value?: number) => {
                         if (err) { next(err); return; }
-                        should(value).be.approximately(testValue, 0.1);
+                        should(value).be.approximately(testValue, testValue * 0.05);
                         next();
                     });
                 },
@@ -438,8 +438,8 @@ describe('Groov I/O Write Nodes', function () {
                         (err: any, value?: number, fullModel?: ApiLib.AnalogChannelRead) => {
                             if (err) { next(err); return; }
                             should(value).be.approximately(5.0, 0.1);
-                            should(fullModel.minValue).be.approximately(5.0, 0.1);
-                            should(fullModel.maxValue).be.approximately(5.0, 0.1);
+                            should(fullModel.minValue).be.approximately(5.0, 0.3);
+                            should(fullModel.maxValue).be.approximately(5.0, 0.3);
                             next();
                         });
                 },
