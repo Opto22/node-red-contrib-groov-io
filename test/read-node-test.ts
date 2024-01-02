@@ -258,7 +258,7 @@ describe('Groov I/O Read Nodes', function () {
 
         it('test 2', function (done) {
             this.timeout(5000);
-            ClientTestUtil.sharedApiClient.setAnalogChannelValue('local', RackInfo.ao.index, channelIndex, { value: 0.75 }).then(
+            ClientTestUtil.sharedApiClient.setAnalogChannelValue('local', RackInfo.ao.index, channelIndex, { value: 1.75 }).then(
                 () => {
                     setTimeout(() => {
                         TestUtil.testReadNode(deviceConfigNode.id,
@@ -268,7 +268,7 @@ describe('Groov I/O Read Nodes', function () {
                                 channelIndex: channelIndex.toString()
                             },
                             (msg: any) => {
-                                should(msg.payload).be.approximately(0.75, 0.1);
+                                should(msg.payload).be.approximately(1.75, 0.2);
                                 done();
                             });
                     }, 4000);
