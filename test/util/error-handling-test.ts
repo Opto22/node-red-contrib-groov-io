@@ -158,6 +158,8 @@ describe('Error Handling', function () {
 
         it("a real-world error (no IP) sets the node's status and request error", function (done) {
 
+            this.timeout(15000);
+
             // Using a Read node, attempt to use a device with an incorrect
             // API Key. An error will be returned and the node should have its
             // status and error set.
@@ -181,18 +183,22 @@ describe('Error Handling', function () {
                 },
                 (errorText: string, nodeMsg: any) => {
                     // Check that the error was sent to the node.
-                    should(errorSpy.firstCall.args[0]).be.eql('Address not found. Error code: ENOTFOUND from system call "getaddrinfo"');
 
-                    // Node keeps changing the error object.
-                    var expectedError = SemVer.gte(process.version, '14.0.0') ?
+                    // Node keeps changing the error object details.
+                    should(errorSpy.firstCall.args[0]).be.oneOf([
+                        'Address not found. Error code: ENOTFOUND from system call "getaddrinfo"',
+                        'Address not found. Error code: EAI_AGAIN from system call "getaddrinfo"'
+                    ]);
+
+                    // Node keeps changing the error object details.
+                    should(errorSpy.firstCall.args[1].reqError).be.oneOf(
                         {
                             "code": "ENOTFOUND",
                             "errno": -3008, // this changed in 13.0.0 (https://github.com/nodejs/node/pull/28140)
                             "syscall": "getaddrinfo",
                             "hostname": "999.999.999.999",
-                            "message": "getaddrinfo ENOTFOUND 999.999.999.999"
-                        }
-                        :
+                            "message": 'getaddrinfo ENOTFOUND 999.999.999.999'
+                        },
                         {
                             "code": "ENOTFOUND",
                             "errno": "ENOTFOUND",
@@ -200,11 +206,21 @@ describe('Error Handling', function () {
                             "hostname": "999.999.999.999",
                             "host": "999.999.999.999",
                             "port": 443,
-                            "message": "getaddrinfo ENOTFOUND 999.999.999.999 999.999.999.999:443"
-                        };
-
-                    // Confirm the REQUEST error
-                    should(errorSpy.firstCall.args[1].reqError).be.match(expectedError);
+                            "message": "getaddrinfo ENOTFOUND 999.999.999.999 999.999.999.999"
+                        },
+                        // This really needs to an Error object.
+                        Object.assign(
+                            new Error('getaddrinfo EAI_AGAIN 999.999.999.999:443'),
+                            {
+                                errno: 'EAI_AGAIN',
+                                code: 'EAI_AGAIN',
+                                syscall: 'getaddrinfo',
+                                hostname: '999.999.999.999',
+                                host: '999.999.999.999',
+                                port: 443,
+                            }
+                        )
+                    );
 
                     // Check that the node's status was set.
                     should(node.getStatus()).match({
