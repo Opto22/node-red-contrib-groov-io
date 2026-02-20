@@ -190,37 +190,13 @@ describe('Error Handling', function () {
                         'Address not found. Error code: EAI_AGAIN from system call "getaddrinfo"'
                     ]);
 
-                    // Node keeps changing the error object details.
-                    should(errorSpy.firstCall.args[1].reqError).be.oneOf(
-                        {
-                            "code": "ENOTFOUND",
-                            "errno": -3008, // this changed in 13.0.0 (https://github.com/nodejs/node/pull/28140)
-                            "syscall": "getaddrinfo",
-                            "hostname": "999.999.999.999",
-                            "message": 'getaddrinfo ENOTFOUND 999.999.999.999'
-                        },
-                        {
-                            "code": "ENOTFOUND",
-                            "errno": "ENOTFOUND",
-                            "syscall": "getaddrinfo",
-                            "hostname": "999.999.999.999",
-                            "host": "999.999.999.999",
-                            "port": 443,
-                            "message": "getaddrinfo ENOTFOUND 999.999.999.999 999.999.999.999"
-                        },
-                        // This really needs to an Error object.
-                        Object.assign(
-                            new Error('getaddrinfo EAI_AGAIN 999.999.999.999:443'),
-                            {
-                                errno: 'EAI_AGAIN',
-                                code: 'EAI_AGAIN',
-                                syscall: 'getaddrinfo',
-                                hostname: '999.999.999.999',
-                                host: '999.999.999.999',
-                                port: 443,
-                            }
-                        )
-                    );
+                    // Test some of the error object's details.
+                    // These aren't consistent between OSes or versions of Node.js,
+                    // so don't be too picky.
+                    var errorObj = errorSpy.firstCall.args[1].reqError;
+                    should(errorObj.syscall).be.eql('getaddrinfo');
+                    should(errorObj.hostname).be.eql('999.999.999.999');
+                    should(errorObj.code).be.oneOf(['ENOTFOUND', 'EAI_AGAIN']);
 
                     // Check that the node's status was set.
                     should(node.getStatus()).match({
