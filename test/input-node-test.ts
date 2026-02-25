@@ -219,7 +219,8 @@ describe('Groov I/O Input Nodes', function () {
                     process.nextTick(next);
                 },
                 // Wait for the Input node to start up.
-                (next: () => void) => { setTimeout(next, 500); },
+                // The initial certificate exchange can take a moment?
+                (next: () => void) => { setTimeout(next, 2000); },
                 // Turn on the output 
                 (next: () => void) => { asyncTestHelper.turnDigitalOn(next) },
                 // Wait for the Input node to process the new value.
