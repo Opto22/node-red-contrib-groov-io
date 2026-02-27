@@ -11,10 +11,18 @@
     "build": "grunt"
   },
   "dependencies": {
-    "simple-node-logger": "18.12.22",
-    "request": "2.88.0",
-    "bluebird": "3.5.3",
-    "semver": "5.6.0"
+    "simple-node-logger": "21.8.12",
+    "request": "2.88.2",
+    "bluebird": "3.7.2",
+    "semver": "7.7.4"
+  },
+  "overrides": {
+    "request": {
+      "lodash": "4.17.23",
+      "tough-cookie": "4.1.3",
+      "form-data": "2.5.5",
+      "qs": "6.14.2"
+    }
   },
   "devDependencies": {
     "@types/bluebird": "3.5.25",
