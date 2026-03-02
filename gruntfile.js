@@ -121,7 +121,7 @@ module.exports = function(grunt) {
       'swagger-codegen-manage-public-lib':
         'java -jar tools/swagger-codegen-cli-2.4.2.jar generate -i src/swagger/spec/manage-api-public.yaml -l typescript-node -o src/swagger/lib  -t src/swagger/codegen/api.typescript-request.mustache',
       'wget-swagger-codegen':
-        'wget -O tools/swagger-codegen-cli-2.4.2.jar http://repo1.maven.org/maven2/io/swagger/swagger-codegen-cli/2.4.2/swagger-codegen-cli-2.4.2.jar'
+        'wget -O tools/swagger-codegen-cli-2.4.2.jar https://repo1.maven.org/maven2/io/swagger/swagger-codegen-cli/2.4.2/swagger-codegen-cli-2.4.2.jar'
     },
   });
 
