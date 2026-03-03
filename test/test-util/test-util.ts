@@ -348,7 +348,7 @@ export function getMmpValue(mmpAddress: string,
     done: (err?: any, value?: any) => void) {
 
     ClientTestUtil.sharedApiClient.getMmpValues('local', mmpAddress, dataType, length || 1, stringEncoding)
-        .then((fulfilledResponse: { response: http.ClientResponse; body: ApiLib.MmpNumericValues }) => {
+        .then((fulfilledResponse: { response: http.IncomingMessage; body: ApiLib.MmpNumericValues }) => {
 
             done(undefined, fulfilledResponse.body.mmpValues[0]);
         }, done);
@@ -383,7 +383,7 @@ export function getAnalogInput(outModuleIndex: number, channelIndex: number,
     done: (err: any, value?: number, fullModel?: ApiLib.AnalogChannelRead) => void) {
     ClientTestUtil.sharedApiClient.getChannelAnalogStatus('local', outModuleIndex, channelIndex)
         .then(
-            (fulfilledResponse: { response: http.ClientResponse; body: ApiLib.AnalogChannelRead }) => {
+            (fulfilledResponse: { response: http.IncomingMessage; body: ApiLib.AnalogChannelRead }) => {
                 done(undefined, fulfilledResponse.body.value, fulfilledResponse.body);
             },
             done // pass back any errors
@@ -394,7 +394,7 @@ export function getDigitalInput(outModuleIndex: number, channelIndex: number,
     done: (err: any, status?: ApiLib.DigitalChannelRead) => void) {
     ClientTestUtil.sharedApiClient.getChannelDigitalStatus('local', outModuleIndex, channelIndex)
         .then(
-            (fulfilledResponse: { response: http.ClientResponse; body: ApiLib.DigitalChannelRead }) => {
+            (fulfilledResponse: { response: http.IncomingMessage; body: ApiLib.DigitalChannelRead }) => {
                 done(undefined, fulfilledResponse.body);
             },
             done // pass back any errors

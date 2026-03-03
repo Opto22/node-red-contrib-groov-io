@@ -3,13 +3,12 @@ import http = require('http');
 import https = require('https');
 import * as fs from 'fs';
 import * as path from 'path';
-import * as Promise from 'bluebird';
 import * as ApiLib from "../../src/swagger/lib/api";
 import { updateShorthandPropertyAssignment } from 'typescript';
 import { nextTick } from 'async';
 
 interface PromiseResponse {
-    response: http.ClientResponse;
+    response: http.IncomingMessage;
     body: any; // Since we don't do anything much with the response bodies, we can ignore the type.
 }
 
@@ -111,7 +110,7 @@ export class ClientTestUtil {
     }
 
     static getApiKey(username: string, password: string):
-        Promise<{ response: http.ClientResponse; body: UserFullData }> {
+        Promise<{ response: http.IncomingMessage; body: UserFullData }> {
 
         let localVarRequestOptions: localVarRequest.Options = {
             method: 'POST',
@@ -133,7 +132,7 @@ export class ClientTestUtil {
         // localVarRequestOptions.agent = this.httpsAgent;
         localVarRequestOptions.timeout = 15000;
 
-        return new Promise<{ response: http.ClientResponse; body: UserFullData; }>((resolve, reject) => {
+        return new Promise<{ response: http.IncomingMessage; body: UserFullData; }>((resolve, reject) => {
             localVarRequest(localVarRequestOptions, (error, response, body) => {
                 if (error) {
                     reject(error);
@@ -149,7 +148,7 @@ export class ClientTestUtil {
     }
 
     static getCert(userData: UserFullData):
-        Promise<{ response: http.ClientResponse; body: any }> {
+        Promise<{ response: http.IncomingMessage; body: any }> {
 
         let localVarRequestOptions: localVarRequest.Options = {
             method: 'GET',
@@ -168,7 +167,7 @@ export class ClientTestUtil {
         // localVarRequestOptions.agent = this.httpsAgent;
         localVarRequestOptions.timeout = 15000;
 
-        return new Promise<{ response: http.ClientResponse; body: any; }>((resolve, reject) => {
+        return new Promise<{ response: http.IncomingMessage; body: any; }>((resolve, reject) => {
             localVarRequest(localVarRequestOptions, (error, response, body) => {
                 if (error) {
                     reject(error);

@@ -1,7 +1,6 @@
 import * as fs from 'fs';
 import * as should from 'should';
 import * as assert from 'assert';
-import * as Promise from 'bluebird';
 import * as http from 'http';
 import async = require('async');
 import * as ApiLib from "../src/swagger/lib/api";
@@ -10,7 +9,7 @@ import { visitFunctionBody } from 'typescript';
 import { RackInfo } from './test-util/rack-info';
 
 interface PromiseResponse {
-    response: http.ClientResponse;
+    response: http.IncomingMessage;
     body: any; // Since we don't do anything much with the response bodies, we can ignore the type.
 }
 

@@ -21,7 +21,6 @@ import * as ConfigHandler from "./config-node";
 // Import external modules
 import http = require('http');
 import * as NodeRed from '../../submodules/opto22-node-red-common/typings/nodered';
-import Promise = require('bluebird');
 import * as ErrorHanding from "../util/error-handling";
 import { FunctionNodeBaseImpl, NodeBaseConfiguration, PromiseResponse } from "./base-node";
 

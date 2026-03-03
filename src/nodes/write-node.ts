@@ -20,7 +20,6 @@ import * as ConfigHandler from "./config-node";
 // Import external modules
 import http = require('http');
 import * as NodeRed from '../../submodules/opto22-node-red-common/typings/nodered';
-import Promise = require('bluebird');
 import * as ErrorHanding from "../util/error-handling";
 import { FunctionNodeBaseImpl, NodeBaseConfiguration, PromiseResponse, MmpDataType } from "./base-node";
 
@@ -130,7 +129,7 @@ export class WriteNodeImpl extends FunctionNodeBaseImpl {
             this.node.status({ fill: "green", shape: "dot", text: "writing" });
         }
 
-        var promise: Promise<{ response: http.ClientResponse; body?: any; }>
+        var promise: Promise<{ response: http.IncomingMessage; body?: any; }>
 
         if (this.apiClient) {
             promise = this.getWriteRequest(msg, valueFinal);
@@ -315,7 +314,7 @@ export class WriteNodeImpl extends FunctionNodeBaseImpl {
  * Returns a promise for the given controller and node configuration.
  * Basically maps the different options to the specific method.
  */
-    private getWriteRequest(msg: any, value: any): Promise<{ response: http.ClientResponse; body?: any; }> {
+    private getWriteRequest(msg: any, value: any): Promise<{ response: http.IncomingMessage; body?: any; }> {
         var nodeConfig = this.nodeConfig;
 
         // Message overrides

@@ -114,7 +114,7 @@ describe('Groov I/O Write Nodes', function () {
                 // Use the client lib to turn ON the channel
                 (next: (err?: Error) => void) => {
                     ClientTestUtil.sharedApiClient.setDigitalChannelState('local', RackInfo.do.index, channelIndex, { value: true }).then(
-                        (fullfilledResponse: { response: http.ClientResponse; body: ApiLib.DigitalChannelRead; }) => {
+                        (fullfilledResponse: { response: http.IncomingMessage; body: ApiLib.DigitalChannelRead; }) => {
                             next();
                         });
                 },
@@ -129,7 +129,7 @@ describe('Groov I/O Write Nodes', function () {
                 // Read the state and test
                 (next: (err?: Error) => void) => {
                     ClientTestUtil.sharedApiClient.getChannelDigitalStatus('local', RackInfo.do.index, channelIndex).then(
-                        (fullfilledResponse: { response: http.ClientResponse; body: ApiLib.DigitalChannelRead; }) => {
+                        (fullfilledResponse: { response: http.IncomingMessage; body: ApiLib.DigitalChannelRead; }) => {
                             should(fullfilledResponse.body.state).be.false();
                             next();
                         });
@@ -145,7 +145,7 @@ describe('Groov I/O Write Nodes', function () {
                 // Read the state and test
                 (next: (err?: Error) => void) => {
                     ClientTestUtil.sharedApiClient.getChannelDigitalStatus('local', RackInfo.do.index, channelIndex).then(
-                        (fullfilledResponse: { response: http.ClientResponse; body: ApiLib.DigitalChannelRead; }) => {
+                        (fullfilledResponse: { response: http.IncomingMessage; body: ApiLib.DigitalChannelRead; }) => {
                             should(fullfilledResponse.body.state).be.true();
                             next();
                         },
@@ -600,14 +600,14 @@ describe('Groov I/O Write Nodes', function () {
                 // Use the client lib to turn ON the channel
                 (next: (err?: Error) => void) => {
                     ClientTestUtil.sharedApiClient.setDigitalChannelState('local', RackInfo.do.index, channelIndex, { value: true }).then(
-                        (fullfilledResponse: { response: http.ClientResponse; body: ApiLib.DigitalChannelRead; }) => {
+                        (fullfilledResponse: { response: http.IncomingMessage; body: ApiLib.DigitalChannelRead; }) => {
                             next();
                         });
                 },
                 // Read the state and test (this is just a sanity check on the channel's state)
                 (next: (err?: Error) => void) => {
                     ClientTestUtil.sharedApiClient.getChannelDigitalStatus('local', RackInfo.do.index, channelIndex).then(
-                        (fullfilledResponse: { response: http.ClientResponse; body: ApiLib.DigitalChannelRead; }) => {
+                        (fullfilledResponse: { response: http.IncomingMessage; body: ApiLib.DigitalChannelRead; }) => {
                             should(fullfilledResponse.body.state).be.true();
                             next();
                         });
@@ -632,7 +632,7 @@ describe('Groov I/O Write Nodes', function () {
                 // Read the state and test
                 (next: (err?: Error) => void) => {
                     ClientTestUtil.sharedApiClient.getChannelDigitalStatus('local', RackInfo.do.index, channelIndex).then(
-                        (fullfilledResponse: { response: http.ClientResponse; body: ApiLib.DigitalChannelRead; }) => {
+                        (fullfilledResponse: { response: http.IncomingMessage; body: ApiLib.DigitalChannelRead; }) => {
                             should(fullfilledResponse.body.state).be.false();
                             next();
                         });

@@ -5,7 +5,6 @@ import * as ReadNodeHandler from "../../src/nodes/read-node";
 import * as ConfigHandler from "../../src/nodes/config-node";
 import * as sinon from 'sinon';
 import * as assert from 'assert';
-import * as Promise from 'bluebird';
 import * as http from 'http';
 import { ResponseErrorMessages, StatusCodeMessages, handleErrorResponse } from '../../src/util/error-handling';
 import * as process from 'process';

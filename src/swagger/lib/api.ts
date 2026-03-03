@@ -13,7 +13,6 @@
 import localVarRequest = require('request');
 import http = require('http');
 import https = require('https');
-import Promise = require('bluebird');
 
 let defaultBasePath = 'https://localhost/manage';
 
@@ -689,7 +688,7 @@ export class DefaultApi {
      * @param file 
      * @param {*} [options] Override http request options.
      */
-    public addFile(area: string, fileName: string, file: Buffer, options: any = {}): Promise<{ response: http.ClientResponse; body?: any; }> {
+    public addFile(area: string, fileName: string, file: Buffer, options: any = {}): Promise<{ response: http.IncomingMessage; body?: any; }> {
         const localVarPath = this.basePath + '/api/v1/files/{area}/content/{fileName}'
             .replace('{' + 'area' + '}', encodeURIComponent(String(area)))
             .replace('{' + 'fileName' + '}', encodeURIComponent(String(fileName)));
@@ -755,7 +754,7 @@ export class DefaultApi {
                 localVarRequestOptions.form = localVarFormParams;
             }
         }
-        return new Promise<{ response: http.ClientResponse; body?: any; }>((resolve, reject) => {
+        return new Promise<{ response: http.IncomingMessage; body?: any; }>((resolve, reject) => {
             localVarRequest(localVarRequestOptions, (error, response, body) => {
                 if (error) {
                     reject(error);
@@ -776,7 +775,7 @@ export class DefaultApi {
      * @param channelIndex The index of the channel, between 0 and one less than the number of channels on the current module.
      * @param {*} [options] Override http request options.
      */
-    public clearAnalogChannelMaxValue(device: string, moduleIndex: number, channelIndex: number, options: any = {}): Promise<{ response: http.ClientResponse; body?: any; }> {
+    public clearAnalogChannelMaxValue(device: string, moduleIndex: number, channelIndex: number, options: any = {}): Promise<{ response: http.IncomingMessage; body?: any; }> {
         const localVarPath = this.basePath + '/api/v1/io/{device}/modules/{moduleIndex}/channels/{channelIndex}/analog/max-value/clear'
             .replace('{' + 'device' + '}', encodeURIComponent(String(device)))
             .replace('{' + 'moduleIndex' + '}', encodeURIComponent(String(moduleIndex)))
@@ -838,7 +837,7 @@ export class DefaultApi {
                 localVarRequestOptions.form = localVarFormParams;
             }
         }
-        return new Promise<{ response: http.ClientResponse; body?: any; }>((resolve, reject) => {
+        return new Promise<{ response: http.IncomingMessage; body?: any; }>((resolve, reject) => {
             localVarRequest(localVarRequestOptions, (error, response, body) => {
                 if (error) {
                     reject(error);
@@ -859,7 +858,7 @@ export class DefaultApi {
      * @param channelIndex The index of the channel, between 0 and one less than the number of channels on the current module.
      * @param {*} [options] Override http request options.
      */
-    public clearAnalogChannelMinValue(device: string, moduleIndex: number, channelIndex: number, options: any = {}): Promise<{ response: http.ClientResponse; body?: any; }> {
+    public clearAnalogChannelMinValue(device: string, moduleIndex: number, channelIndex: number, options: any = {}): Promise<{ response: http.IncomingMessage; body?: any; }> {
         const localVarPath = this.basePath + '/api/v1/io/{device}/modules/{moduleIndex}/channels/{channelIndex}/analog/min-value/clear'
             .replace('{' + 'device' + '}', encodeURIComponent(String(device)))
             .replace('{' + 'moduleIndex' + '}', encodeURIComponent(String(moduleIndex)))
@@ -921,7 +920,7 @@ export class DefaultApi {
                 localVarRequestOptions.form = localVarFormParams;
             }
         }
-        return new Promise<{ response: http.ClientResponse; body?: any; }>((resolve, reject) => {
+        return new Promise<{ response: http.IncomingMessage; body?: any; }>((resolve, reject) => {
             localVarRequest(localVarRequestOptions, (error, response, body) => {
                 if (error) {
                     reject(error);
@@ -942,7 +941,7 @@ export class DefaultApi {
      * @param channelIndex The index of the channel, between 0 and one less than the number of channels on the current module.
      * @param {*} [options] Override http request options.
      */
-    public clearDigitalChannelFeature(device: string, moduleIndex: number, channelIndex: number, options: any = {}): Promise<{ response: http.ClientResponse; body?: any; }> {
+    public clearDigitalChannelFeature(device: string, moduleIndex: number, channelIndex: number, options: any = {}): Promise<{ response: http.IncomingMessage; body?: any; }> {
         const localVarPath = this.basePath + '/api/v1/io/{device}/modules/{moduleIndex}/channels/{channelIndex}/digital/feature/clear'
             .replace('{' + 'device' + '}', encodeURIComponent(String(device)))
             .replace('{' + 'moduleIndex' + '}', encodeURIComponent(String(moduleIndex)))
@@ -1004,7 +1003,7 @@ export class DefaultApi {
                 localVarRequestOptions.form = localVarFormParams;
             }
         }
-        return new Promise<{ response: http.ClientResponse; body?: any; }>((resolve, reject) => {
+        return new Promise<{ response: http.IncomingMessage; body?: any; }>((resolve, reject) => {
             localVarRequest(localVarRequestOptions, (error, response, body) => {
                 if (error) {
                     reject(error);
@@ -1025,7 +1024,7 @@ export class DefaultApi {
      * @param channelIndex The index of the channel, between 0 and one less than the number of channels on the current module.
      * @param {*} [options] Override http request options.
      */
-    public clearDigitalChannelOffLatch(device: string, moduleIndex: number, channelIndex: number, options: any = {}): Promise<{ response: http.ClientResponse; body?: any; }> {
+    public clearDigitalChannelOffLatch(device: string, moduleIndex: number, channelIndex: number, options: any = {}): Promise<{ response: http.IncomingMessage; body?: any; }> {
         const localVarPath = this.basePath + '/api/v1/io/{device}/modules/{moduleIndex}/channels/{channelIndex}/digital/off-latch/clear'
             .replace('{' + 'device' + '}', encodeURIComponent(String(device)))
             .replace('{' + 'moduleIndex' + '}', encodeURIComponent(String(moduleIndex)))
@@ -1087,7 +1086,7 @@ export class DefaultApi {
                 localVarRequestOptions.form = localVarFormParams;
             }
         }
-        return new Promise<{ response: http.ClientResponse; body?: any; }>((resolve, reject) => {
+        return new Promise<{ response: http.IncomingMessage; body?: any; }>((resolve, reject) => {
             localVarRequest(localVarRequestOptions, (error, response, body) => {
                 if (error) {
                     reject(error);
@@ -1108,7 +1107,7 @@ export class DefaultApi {
      * @param channelIndex The index of the channel, between 0 and one less than the number of channels on the current module.
      * @param {*} [options] Override http request options.
      */
-    public clearDigitalChannelOnLatch(device: string, moduleIndex: number, channelIndex: number, options: any = {}): Promise<{ response: http.ClientResponse; body?: any; }> {
+    public clearDigitalChannelOnLatch(device: string, moduleIndex: number, channelIndex: number, options: any = {}): Promise<{ response: http.IncomingMessage; body?: any; }> {
         const localVarPath = this.basePath + '/api/v1/io/{device}/modules/{moduleIndex}/channels/{channelIndex}/digital/on-latch/clear'
             .replace('{' + 'device' + '}', encodeURIComponent(String(device)))
             .replace('{' + 'moduleIndex' + '}', encodeURIComponent(String(moduleIndex)))
@@ -1170,7 +1169,7 @@ export class DefaultApi {
                 localVarRequestOptions.form = localVarFormParams;
             }
         }
-        return new Promise<{ response: http.ClientResponse; body?: any; }>((resolve, reject) => {
+        return new Promise<{ response: http.IncomingMessage; body?: any; }>((resolve, reject) => {
             localVarRequest(localVarRequestOptions, (error, response, body) => {
                 if (error) {
                     reject(error);
@@ -1190,7 +1189,7 @@ export class DefaultApi {
      * @param fileName 
      * @param {*} [options] Override http request options.
      */
-    public deleteFile(area: string, fileName: string, options: any = {}): Promise<{ response: http.ClientResponse; body?: any; }> {
+    public deleteFile(area: string, fileName: string, options: any = {}): Promise<{ response: http.IncomingMessage; body?: any; }> {
         const localVarPath = this.basePath + '/api/v1/files/{area}/content/{fileName}'
             .replace('{' + 'area' + '}', encodeURIComponent(String(area)))
             .replace('{' + 'fileName' + '}', encodeURIComponent(String(fileName)));
@@ -1246,7 +1245,7 @@ export class DefaultApi {
                 localVarRequestOptions.form = localVarFormParams;
             }
         }
-        return new Promise<{ response: http.ClientResponse; body?: any; }>((resolve, reject) => {
+        return new Promise<{ response: http.IncomingMessage; body?: any; }>((resolve, reject) => {
             localVarRequest(localVarRequestOptions, (error, response, body) => {
                 if (error) {
                     reject(error);
@@ -1267,7 +1266,7 @@ export class DefaultApi {
      * @param channelIndex The index of the channel, between 0 and one less than the number of channels on the current module.
      * @param {*} [options] Override http request options.
      */
-    public getChannelAnalogStatus(device: string, moduleIndex: number, channelIndex: number, options: any = {}): Promise<{ response: http.ClientResponse; body: AnalogChannelRead; }> {
+    public getChannelAnalogStatus(device: string, moduleIndex: number, channelIndex: number, options: any = {}): Promise<{ response: http.IncomingMessage; body: AnalogChannelRead; }> {
         const localVarPath = this.basePath + '/api/v1/io/{device}/modules/{moduleIndex}/channels/{channelIndex}/analog/status'
             .replace('{' + 'device' + '}', encodeURIComponent(String(device)))
             .replace('{' + 'moduleIndex' + '}', encodeURIComponent(String(moduleIndex)))
@@ -1329,7 +1328,7 @@ export class DefaultApi {
                 localVarRequestOptions.form = localVarFormParams;
             }
         }
-        return new Promise<{ response: http.ClientResponse; body: AnalogChannelRead; }>((resolve, reject) => {
+        return new Promise<{ response: http.IncomingMessage; body: AnalogChannelRead; }>((resolve, reject) => {
             localVarRequest(localVarRequestOptions, (error, response, body) => {
                 if (error) {
                     reject(error);
@@ -1350,7 +1349,7 @@ export class DefaultApi {
      * @param channelIndex The index of the channel, between 0 and one less than the number of channels on the current module.
      * @param {*} [options] Override http request options.
      */
-    public getChannelConfiguration(device: string, moduleIndex: number, channelIndex: number, options: any = {}): Promise<{ response: http.ClientResponse; body: ChannelConfig; }> {
+    public getChannelConfiguration(device: string, moduleIndex: number, channelIndex: number, options: any = {}): Promise<{ response: http.IncomingMessage; body: ChannelConfig; }> {
         const localVarPath = this.basePath + '/api/v1/io/{device}/modules/{moduleIndex}/channels/{channelIndex}/config'
             .replace('{' + 'device' + '}', encodeURIComponent(String(device)))
             .replace('{' + 'moduleIndex' + '}', encodeURIComponent(String(moduleIndex)))
@@ -1412,7 +1411,7 @@ export class DefaultApi {
                 localVarRequestOptions.form = localVarFormParams;
             }
         }
-        return new Promise<{ response: http.ClientResponse; body: ChannelConfig; }>((resolve, reject) => {
+        return new Promise<{ response: http.IncomingMessage; body: ChannelConfig; }>((resolve, reject) => {
             localVarRequest(localVarRequestOptions, (error, response, body) => {
                 if (error) {
                     reject(error);
@@ -1431,7 +1430,7 @@ export class DefaultApi {
      * @param channelId A string of the hexadecimal value for the Channel Type ID. For example, \&quot;0x60000002\&quot;.
      * @param {*} [options] Override http request options.
      */
-    public getChannelDescription(channelId: string, options: any = {}): Promise<{ response: http.ClientResponse; body: ChannelDescription; }> {
+    public getChannelDescription(channelId: string, options: any = {}): Promise<{ response: http.IncomingMessage; body: ChannelDescription; }> {
         const localVarPath = this.basePath + '/api/v1/io/descriptions/channels/{channelId}'
             .replace('{' + 'channelId' + '}', encodeURIComponent(String(channelId)));
         let localVarQueryParameters: any = {};
@@ -1481,7 +1480,7 @@ export class DefaultApi {
                 localVarRequestOptions.form = localVarFormParams;
             }
         }
-        return new Promise<{ response: http.ClientResponse; body: ChannelDescription; }>((resolve, reject) => {
+        return new Promise<{ response: http.IncomingMessage; body: ChannelDescription; }>((resolve, reject) => {
             localVarRequest(localVarRequestOptions, (error, response, body) => {
                 if (error) {
                     reject(error);
@@ -1499,7 +1498,7 @@ export class DefaultApi {
      * Returns all Channel Descriptions.
      * @param {*} [options] Override http request options.
      */
-    public getChannelDescriptions(options: any = {}): Promise<{ response: http.ClientResponse; body: ChannelDescriptions; }> {
+    public getChannelDescriptions(options: any = {}): Promise<{ response: http.IncomingMessage; body: ChannelDescriptions; }> {
         const localVarPath = this.basePath + '/api/v1/io/descriptions/channels';
         let localVarQueryParameters: any = {};
         let localVarHeaderParams: any = (<any>Object).assign({}, this.defaultHeaders);
@@ -1543,7 +1542,7 @@ export class DefaultApi {
                 localVarRequestOptions.form = localVarFormParams;
             }
         }
-        return new Promise<{ response: http.ClientResponse; body: ChannelDescriptions; }>((resolve, reject) => {
+        return new Promise<{ response: http.IncomingMessage; body: ChannelDescriptions; }>((resolve, reject) => {
             localVarRequest(localVarRequestOptions, (error, response, body) => {
                 if (error) {
                     reject(error);
@@ -1564,7 +1563,7 @@ export class DefaultApi {
      * @param channelIndex The index of the channel, between 0 and one less than the number of channels on the current module.
      * @param {*} [options] Override http request options.
      */
-    public getChannelDigitalStatus(device: string, moduleIndex: number, channelIndex: number, options: any = {}): Promise<{ response: http.ClientResponse; body: DigitalChannelRead; }> {
+    public getChannelDigitalStatus(device: string, moduleIndex: number, channelIndex: number, options: any = {}): Promise<{ response: http.IncomingMessage; body: DigitalChannelRead; }> {
         const localVarPath = this.basePath + '/api/v1/io/{device}/modules/{moduleIndex}/channels/{channelIndex}/digital/status'
             .replace('{' + 'device' + '}', encodeURIComponent(String(device)))
             .replace('{' + 'moduleIndex' + '}', encodeURIComponent(String(moduleIndex)))
@@ -1626,7 +1625,7 @@ export class DefaultApi {
                 localVarRequestOptions.form = localVarFormParams;
             }
         }
-        return new Promise<{ response: http.ClientResponse; body: DigitalChannelRead; }>((resolve, reject) => {
+        return new Promise<{ response: http.IncomingMessage; body: DigitalChannelRead; }>((resolve, reject) => {
             localVarRequest(localVarRequestOptions, (error, response, body) => {
                 if (error) {
                     reject(error);
@@ -1646,7 +1645,7 @@ export class DefaultApi {
      * @param moduleIndex The index of the module, between 0 and 15.
      * @param {*} [options] Override http request options.
      */
-    public getChannelNames(device: string, moduleIndex: number, options: any = {}): Promise<{ response: http.ClientResponse; body: ChannelNames; }> {
+    public getChannelNames(device: string, moduleIndex: number, options: any = {}): Promise<{ response: http.IncomingMessage; body: ChannelNames; }> {
         const localVarPath = this.basePath + '/api/v1/io/{device}/modules/{moduleIndex}/channels/names'
             .replace('{' + 'device' + '}', encodeURIComponent(String(device)))
             .replace('{' + 'moduleIndex' + '}', encodeURIComponent(String(moduleIndex)));
@@ -1702,7 +1701,7 @@ export class DefaultApi {
                 localVarRequestOptions.form = localVarFormParams;
             }
         }
-        return new Promise<{ response: http.ClientResponse; body: ChannelNames; }>((resolve, reject) => {
+        return new Promise<{ response: http.IncomingMessage; body: ChannelNames; }>((resolve, reject) => {
             localVarRequest(localVarRequestOptions, (error, response, body) => {
                 if (error) {
                     reject(error);
@@ -1722,7 +1721,7 @@ export class DefaultApi {
      * @param fileName 
      * @param {*} [options] Override http request options.
      */
-    public getFile(area: string, fileName: string, options: any = {}): Promise<{ response: http.ClientResponse; body?: any; }> {
+    public getFile(area: string, fileName: string, options: any = {}): Promise<{ response: http.IncomingMessage; body?: any; }> {
         const localVarPath = this.basePath + '/api/v1/files/{area}/content/{fileName}'
             .replace('{' + 'area' + '}', encodeURIComponent(String(area)))
             .replace('{' + 'fileName' + '}', encodeURIComponent(String(fileName)));
@@ -1778,7 +1777,7 @@ export class DefaultApi {
                 localVarRequestOptions.form = localVarFormParams;
             }
         }
-        return new Promise<{ response: http.ClientResponse; body?: any; }>((resolve, reject) => {
+        return new Promise<{ response: http.IncomingMessage; body?: any; }>((resolve, reject) => {
             localVarRequest(localVarRequestOptions, (error, response, body) => {
                 if (error) {
                     reject(error);
@@ -1798,7 +1797,7 @@ export class DefaultApi {
      * @param fileName 
      * @param {*} [options] Override http request options.
      */
-    public getFileInfo(area: string, fileName: string, options: any = {}): Promise<{ response: http.ClientResponse; body: FileDetailsModel; }> {
+    public getFileInfo(area: string, fileName: string, options: any = {}): Promise<{ response: http.IncomingMessage; body: FileDetailsModel; }> {
         const localVarPath = this.basePath + '/api/v1/files/{area}/info/{fileName}'
             .replace('{' + 'area' + '}', encodeURIComponent(String(area)))
             .replace('{' + 'fileName' + '}', encodeURIComponent(String(fileName)));
@@ -1854,7 +1853,7 @@ export class DefaultApi {
                 localVarRequestOptions.form = localVarFormParams;
             }
         }
-        return new Promise<{ response: http.ClientResponse; body: FileDetailsModel; }>((resolve, reject) => {
+        return new Promise<{ response: http.IncomingMessage; body: FileDetailsModel; }>((resolve, reject) => {
             localVarRequest(localVarRequestOptions, (error, response, body) => {
                 if (error) {
                     reject(error);
@@ -1873,7 +1872,7 @@ export class DefaultApi {
      * @param area &#39;unsecured&#39; or &#39;secured&#39;
      * @param {*} [options] Override http request options.
      */
-    public getFiles(area: string, options: any = {}): Promise<{ response: http.ClientResponse; body: FileDetailsArray; }> {
+    public getFiles(area: string, options: any = {}): Promise<{ response: http.IncomingMessage; body: FileDetailsArray; }> {
         const localVarPath = this.basePath + '/api/v1/files/{area}/info'
             .replace('{' + 'area' + '}', encodeURIComponent(String(area)));
         let localVarQueryParameters: any = {};
@@ -1923,7 +1922,7 @@ export class DefaultApi {
                 localVarRequestOptions.form = localVarFormParams;
             }
         }
-        return new Promise<{ response: http.ClientResponse; body: FileDetailsArray; }>((resolve, reject) => {
+        return new Promise<{ response: http.IncomingMessage; body: FileDetailsArray; }>((resolve, reject) => {
             localVarRequest(localVarRequestOptions, (error, response, body) => {
                 if (error) {
                     reject(error);
@@ -1942,7 +1941,7 @@ export class DefaultApi {
      * @param device The name of the device. Use \&quot;local\&quot; for the built-in rack of I/O.
      * @param {*} [options] Override http request options.
      */
-    public getIoConfiguration(device: string, options: any = {}): Promise<{ response: http.ClientResponse; body: IoConfiguration; }> {
+    public getIoConfiguration(device: string, options: any = {}): Promise<{ response: http.IncomingMessage; body: IoConfiguration; }> {
         const localVarPath = this.basePath + '/api/v1/io/{device}/config'
             .replace('{' + 'device' + '}', encodeURIComponent(String(device)));
         let localVarQueryParameters: any = {};
@@ -1992,7 +1991,7 @@ export class DefaultApi {
                 localVarRequestOptions.form = localVarFormParams;
             }
         }
-        return new Promise<{ response: http.ClientResponse; body: IoConfiguration; }>((resolve, reject) => {
+        return new Promise<{ response: http.IncomingMessage; body: IoConfiguration; }>((resolve, reject) => {
             localVarRequest(localVarRequestOptions, (error, response, body) => {
                 if (error) {
                     reject(error);
@@ -2011,7 +2010,7 @@ export class DefaultApi {
      * @param device The name of the device. Use \&quot;local\&quot; for the built-in rack of I/O.
      * @param {*} [options] Override http request options.
      */
-    public getIoInfo(device: string, options: any = {}): Promise<{ response: http.ClientResponse; body: IoInfo; }> {
+    public getIoInfo(device: string, options: any = {}): Promise<{ response: http.IncomingMessage; body: IoInfo; }> {
         const localVarPath = this.basePath + '/api/v1/io/{device}/info'
             .replace('{' + 'device' + '}', encodeURIComponent(String(device)));
         let localVarQueryParameters: any = {};
@@ -2061,7 +2060,7 @@ export class DefaultApi {
                 localVarRequestOptions.form = localVarFormParams;
             }
         }
-        return new Promise<{ response: http.ClientResponse; body: IoInfo; }>((resolve, reject) => {
+        return new Promise<{ response: http.IncomingMessage; body: IoInfo; }>((resolve, reject) => {
             localVarRequest(localVarRequestOptions, (error, response, body) => {
                 if (error) {
                     reject(error);
@@ -2084,7 +2083,7 @@ export class DefaultApi {
      * @param encoding One of &#39;ascii&#39; or &#39;utf8&#39;. This is how the raw memory will be interpreted.
      * @param {*} [options] Override http request options.
      */
-    public getMmpValues(device: string, address: string, type?: string, length?: number, encoding?: string, options: any = {}): Promise<{ response: http.ClientResponse; body: AbstractMmpValues; }> {
+    public getMmpValues(device: string, address: string, type?: string, length?: number, encoding?: string, options: any = {}): Promise<{ response: http.IncomingMessage; body: AbstractMmpValues; }> {
         const localVarPath = this.basePath + '/api/v1/io/{device}/mmp/address/{address}'
             .replace('{' + 'device' + '}', encodeURIComponent(String(device)))
             .replace('{' + 'address' + '}', encodeURIComponent(String(address)));
@@ -2152,7 +2151,7 @@ export class DefaultApi {
                 localVarRequestOptions.form = localVarFormParams;
             }
         }
-        return new Promise<{ response: http.ClientResponse; body: AbstractMmpValues; }>((resolve, reject) => {
+        return new Promise<{ response: http.IncomingMessage; body: AbstractMmpValues; }>((resolve, reject) => {
             localVarRequest(localVarRequestOptions, (error, response, body) => {
                 if (error) {
                     reject(error);
@@ -2172,7 +2171,7 @@ export class DefaultApi {
      * @param moduleIndex The index of the module, between 0 and 15.
      * @param {*} [options] Override http request options.
      */
-    public getModuleAnalogChannelValues(device: string, moduleIndex: number, options: any = {}): Promise<{ response: http.ClientResponse; body: AnalogModuleValues; }> {
+    public getModuleAnalogChannelValues(device: string, moduleIndex: number, options: any = {}): Promise<{ response: http.IncomingMessage; body: AnalogModuleValues; }> {
         const localVarPath = this.basePath + '/api/v1/io/{device}/modules/{moduleIndex}/analog/values'
             .replace('{' + 'device' + '}', encodeURIComponent(String(device)))
             .replace('{' + 'moduleIndex' + '}', encodeURIComponent(String(moduleIndex)));
@@ -2228,7 +2227,7 @@ export class DefaultApi {
                 localVarRequestOptions.form = localVarFormParams;
             }
         }
-        return new Promise<{ response: http.ClientResponse; body: AnalogModuleValues; }>((resolve, reject) => {
+        return new Promise<{ response: http.IncomingMessage; body: AnalogModuleValues; }>((resolve, reject) => {
             localVarRequest(localVarRequestOptions, (error, response, body) => {
                 if (error) {
                     reject(error);
@@ -2248,7 +2247,7 @@ export class DefaultApi {
      * @param moduleIndex The index of the module, between 0 and 15.
      * @param {*} [options] Override http request options.
      */
-    public getModuleConfiguration(device: string, moduleIndex: number, options: any = {}): Promise<{ response: http.ClientResponse; body: ModuleChannelConfig; }> {
+    public getModuleConfiguration(device: string, moduleIndex: number, options: any = {}): Promise<{ response: http.IncomingMessage; body: ModuleChannelConfig; }> {
         const localVarPath = this.basePath + '/api/v1/io/{device}/modules/{moduleIndex}/config'
             .replace('{' + 'device' + '}', encodeURIComponent(String(device)))
             .replace('{' + 'moduleIndex' + '}', encodeURIComponent(String(moduleIndex)));
@@ -2304,7 +2303,7 @@ export class DefaultApi {
                 localVarRequestOptions.form = localVarFormParams;
             }
         }
-        return new Promise<{ response: http.ClientResponse; body: ModuleChannelConfig; }>((resolve, reject) => {
+        return new Promise<{ response: http.IncomingMessage; body: ModuleChannelConfig; }>((resolve, reject) => {
             localVarRequest(localVarRequestOptions, (error, response, body) => {
                 if (error) {
                     reject(error);
@@ -2323,7 +2322,7 @@ export class DefaultApi {
      * @param module The module ID (e.g. \&quot;0x90000014\&quot;) or module product number (e.g. \&quot;GRV-OAC-12-I\&quot;).
      * @param {*} [options] Override http request options.
      */
-    public getModuleDescription(module: string, options: any = {}): Promise<{ response: http.ClientResponse; body: ModuleDescription; }> {
+    public getModuleDescription(module: string, options: any = {}): Promise<{ response: http.IncomingMessage; body: ModuleDescription; }> {
         const localVarPath = this.basePath + '/api/v1/io/descriptions/modules/{module}'
             .replace('{' + 'module' + '}', encodeURIComponent(String(module)));
         let localVarQueryParameters: any = {};
@@ -2373,7 +2372,7 @@ export class DefaultApi {
                 localVarRequestOptions.form = localVarFormParams;
             }
         }
-        return new Promise<{ response: http.ClientResponse; body: ModuleDescription; }>((resolve, reject) => {
+        return new Promise<{ response: http.IncomingMessage; body: ModuleDescription; }>((resolve, reject) => {
             localVarRequest(localVarRequestOptions, (error, response, body) => {
                 if (error) {
                     reject(error);
@@ -2391,7 +2390,7 @@ export class DefaultApi {
      * Returns all Module Descriptions.
      * @param {*} [options] Override http request options.
      */
-    public getModuleDescriptions(options: any = {}): Promise<{ response: http.ClientResponse; body: ModuleDescriptions; }> {
+    public getModuleDescriptions(options: any = {}): Promise<{ response: http.IncomingMessage; body: ModuleDescriptions; }> {
         const localVarPath = this.basePath + '/api/v1/io/descriptions/modules';
         let localVarQueryParameters: any = {};
         let localVarHeaderParams: any = (<any>Object).assign({}, this.defaultHeaders);
@@ -2435,7 +2434,7 @@ export class DefaultApi {
                 localVarRequestOptions.form = localVarFormParams;
             }
         }
-        return new Promise<{ response: http.ClientResponse; body: ModuleDescriptions; }>((resolve, reject) => {
+        return new Promise<{ response: http.IncomingMessage; body: ModuleDescriptions; }>((resolve, reject) => {
             localVarRequest(localVarRequestOptions, (error, response, body) => {
                 if (error) {
                     reject(error);
@@ -2455,7 +2454,7 @@ export class DefaultApi {
      * @param moduleIndex The index of the module, between 0 and 15.
      * @param {*} [options] Override http request options.
      */
-    public getModuleDigitalChannelValues(device: string, moduleIndex: number, options: any = {}): Promise<{ response: http.ClientResponse; body: DigitalModuleValues; }> {
+    public getModuleDigitalChannelValues(device: string, moduleIndex: number, options: any = {}): Promise<{ response: http.IncomingMessage; body: DigitalModuleValues; }> {
         const localVarPath = this.basePath + '/api/v1/io/{device}/modules/{moduleIndex}/digital/values'
             .replace('{' + 'device' + '}', encodeURIComponent(String(device)))
             .replace('{' + 'moduleIndex' + '}', encodeURIComponent(String(moduleIndex)));
@@ -2511,7 +2510,7 @@ export class DefaultApi {
                 localVarRequestOptions.form = localVarFormParams;
             }
         }
-        return new Promise<{ response: http.ClientResponse; body: DigitalModuleValues; }>((resolve, reject) => {
+        return new Promise<{ response: http.IncomingMessage; body: DigitalModuleValues; }>((resolve, reject) => {
             localVarRequest(localVarRequestOptions, (error, response, body) => {
                 if (error) {
                     reject(error);
@@ -2531,7 +2530,7 @@ export class DefaultApi {
      * @param moduleIndex The index of the module, between 0 and 15.
      * @param {*} [options] Override http request options.
      */
-    public getModuleInfo(device: string, moduleIndex: number, options: any = {}): Promise<{ response: http.ClientResponse; body: ModuleInfo; }> {
+    public getModuleInfo(device: string, moduleIndex: number, options: any = {}): Promise<{ response: http.IncomingMessage; body: ModuleInfo; }> {
         const localVarPath = this.basePath + '/api/v1/io/{device}/modules/{moduleIndex}/info'
             .replace('{' + 'device' + '}', encodeURIComponent(String(device)))
             .replace('{' + 'moduleIndex' + '}', encodeURIComponent(String(moduleIndex)));
@@ -2587,7 +2586,7 @@ export class DefaultApi {
                 localVarRequestOptions.form = localVarFormParams;
             }
         }
-        return new Promise<{ response: http.ClientResponse; body: ModuleInfo; }>((resolve, reject) => {
+        return new Promise<{ response: http.IncomingMessage; body: ModuleInfo; }>((resolve, reject) => {
             localVarRequest(localVarRequestOptions, (error, response, body) => {
                 if (error) {
                     reject(error);
@@ -2606,7 +2605,7 @@ export class DefaultApi {
      * @param device The name of the device. Use \&quot;local\&quot; for the built-in rack of I/O.
      * @param {*} [options] Override http request options.
      */
-    public getModuleInfos(device: string, options: any = {}): Promise<{ response: http.ClientResponse; body: InlineResponse200; }> {
+    public getModuleInfos(device: string, options: any = {}): Promise<{ response: http.IncomingMessage; body: InlineResponse200; }> {
         const localVarPath = this.basePath + '/api/v1/io/{device}/modules/info'
             .replace('{' + 'device' + '}', encodeURIComponent(String(device)));
         let localVarQueryParameters: any = {};
@@ -2656,7 +2655,7 @@ export class DefaultApi {
                 localVarRequestOptions.form = localVarFormParams;
             }
         }
-        return new Promise<{ response: http.ClientResponse; body: InlineResponse200; }>((resolve, reject) => {
+        return new Promise<{ response: http.IncomingMessage; body: InlineResponse200; }>((resolve, reject) => {
             localVarRequest(localVarRequestOptions, (error, response, body) => {
                 if (error) {
                     reject(error);
@@ -2675,7 +2674,7 @@ export class DefaultApi {
      * @param device The name of the device. Use \&quot;local\&quot; for the built-in rack of I/O.
      * @param {*} [options] Override http request options.
      */
-    public getModuleQualityFlags(device: string, options: any = {}): Promise<{ response: http.ClientResponse; body: ModuleQualityFlags; }> {
+    public getModuleQualityFlags(device: string, options: any = {}): Promise<{ response: http.IncomingMessage; body: ModuleQualityFlags; }> {
         const localVarPath = this.basePath + '/api/v1/io/{device}/modules/quality'
             .replace('{' + 'device' + '}', encodeURIComponent(String(device)));
         let localVarQueryParameters: any = {};
@@ -2725,7 +2724,7 @@ export class DefaultApi {
                 localVarRequestOptions.form = localVarFormParams;
             }
         }
-        return new Promise<{ response: http.ClientResponse; body: ModuleQualityFlags; }>((resolve, reject) => {
+        return new Promise<{ response: http.IncomingMessage; body: ModuleQualityFlags; }>((resolve, reject) => {
             localVarRequest(localVarRequestOptions, (error, response, body) => {
                 if (error) {
                     reject(error);
@@ -2744,7 +2743,7 @@ export class DefaultApi {
      * @param device The name of the device. Use \&quot;local\&quot; for the built-in rack of I/O.
      * @param {*} [options] Override http request options.
      */
-    public getModuleTypes(device: string, options: any = {}): Promise<{ response: http.ClientResponse; body: ModuleTypes; }> {
+    public getModuleTypes(device: string, options: any = {}): Promise<{ response: http.IncomingMessage; body: ModuleTypes; }> {
         const localVarPath = this.basePath + '/api/v1/io/{device}/modules/type'
             .replace('{' + 'device' + '}', encodeURIComponent(String(device)));
         let localVarQueryParameters: any = {};
@@ -2794,7 +2793,7 @@ export class DefaultApi {
                 localVarRequestOptions.form = localVarFormParams;
             }
         }
-        return new Promise<{ response: http.ClientResponse; body: ModuleTypes; }>((resolve, reject) => {
+        return new Promise<{ response: http.IncomingMessage; body: ModuleTypes; }>((resolve, reject) => {
             localVarRequest(localVarRequestOptions, (error, response, body) => {
                 if (error) {
                     reject(error);
@@ -2816,7 +2815,7 @@ export class DefaultApi {
      * @param body The value for the channel.
      * @param {*} [options] Override http request options.
      */
-    public setAnalogChannelValue(device: string, moduleIndex: number, channelIndex: number, body: NumericValue, options: any = {}): Promise<{ response: http.ClientResponse; body?: any; }> {
+    public setAnalogChannelValue(device: string, moduleIndex: number, channelIndex: number, body: NumericValue, options: any = {}): Promise<{ response: http.IncomingMessage; body?: any; }> {
         const localVarPath = this.basePath + '/api/v1/io/{device}/modules/{moduleIndex}/channels/{channelIndex}/analog/value'
             .replace('{' + 'device' + '}', encodeURIComponent(String(device)))
             .replace('{' + 'moduleIndex' + '}', encodeURIComponent(String(moduleIndex)))
@@ -2884,7 +2883,7 @@ export class DefaultApi {
                 localVarRequestOptions.form = localVarFormParams;
             }
         }
-        return new Promise<{ response: http.ClientResponse; body?: any; }>((resolve, reject) => {
+        return new Promise<{ response: http.IncomingMessage; body?: any; }>((resolve, reject) => {
             localVarRequest(localVarRequestOptions, (error, response, body) => {
                 if (error) {
                     reject(error);
@@ -2906,7 +2905,7 @@ export class DefaultApi {
      * @param body 
      * @param {*} [options] Override http request options.
      */
-    public setChannelConfiguration(device: string, moduleIndex: number, channelIndex: number, body: ChannelConfigWrite, options: any = {}): Promise<{ response: http.ClientResponse; body?: any; }> {
+    public setChannelConfiguration(device: string, moduleIndex: number, channelIndex: number, body: ChannelConfigWrite, options: any = {}): Promise<{ response: http.IncomingMessage; body?: any; }> {
         const localVarPath = this.basePath + '/api/v1/io/{device}/modules/{moduleIndex}/channels/{channelIndex}/config'
             .replace('{' + 'device' + '}', encodeURIComponent(String(device)))
             .replace('{' + 'moduleIndex' + '}', encodeURIComponent(String(moduleIndex)))
@@ -2974,7 +2973,7 @@ export class DefaultApi {
                 localVarRequestOptions.form = localVarFormParams;
             }
         }
-        return new Promise<{ response: http.ClientResponse; body?: any; }>((resolve, reject) => {
+        return new Promise<{ response: http.IncomingMessage; body?: any; }>((resolve, reject) => {
             localVarRequest(localVarRequestOptions, (error, response, body) => {
                 if (error) {
                     reject(error);
@@ -2996,7 +2995,7 @@ export class DefaultApi {
      * @param body The state for the channel.
      * @param {*} [options] Override http request options.
      */
-    public setDigitalChannelCounterActive(device: string, moduleIndex: number, channelIndex: number, body: BooleanValue, options: any = {}): Promise<{ response: http.ClientResponse; body?: any; }> {
+    public setDigitalChannelCounterActive(device: string, moduleIndex: number, channelIndex: number, body: BooleanValue, options: any = {}): Promise<{ response: http.IncomingMessage; body?: any; }> {
         const localVarPath = this.basePath + '/api/v1/io/{device}/modules/{moduleIndex}/channels/{channelIndex}/digital/counter/active'
             .replace('{' + 'device' + '}', encodeURIComponent(String(device)))
             .replace('{' + 'moduleIndex' + '}', encodeURIComponent(String(moduleIndex)))
@@ -3064,7 +3063,7 @@ export class DefaultApi {
                 localVarRequestOptions.form = localVarFormParams;
             }
         }
-        return new Promise<{ response: http.ClientResponse; body?: any; }>((resolve, reject) => {
+        return new Promise<{ response: http.IncomingMessage; body?: any; }>((resolve, reject) => {
             localVarRequest(localVarRequestOptions, (error, response, body) => {
                 if (error) {
                     reject(error);
@@ -3086,7 +3085,7 @@ export class DefaultApi {
      * @param body The state for the channel.
      * @param {*} [options] Override http request options.
      */
-    public setDigitalChannelState(device: string, moduleIndex: number, channelIndex: number, body: BooleanValue, options: any = {}): Promise<{ response: http.ClientResponse; body?: any; }> {
+    public setDigitalChannelState(device: string, moduleIndex: number, channelIndex: number, body: BooleanValue, options: any = {}): Promise<{ response: http.IncomingMessage; body?: any; }> {
         const localVarPath = this.basePath + '/api/v1/io/{device}/modules/{moduleIndex}/channels/{channelIndex}/digital/state'
             .replace('{' + 'device' + '}', encodeURIComponent(String(device)))
             .replace('{' + 'moduleIndex' + '}', encodeURIComponent(String(moduleIndex)))
@@ -3154,7 +3153,7 @@ export class DefaultApi {
                 localVarRequestOptions.form = localVarFormParams;
             }
         }
-        return new Promise<{ response: http.ClientResponse; body?: any; }>((resolve, reject) => {
+        return new Promise<{ response: http.IncomingMessage; body?: any; }>((resolve, reject) => {
             localVarRequest(localVarRequestOptions, (error, response, body) => {
                 if (error) {
                     reject(error);
@@ -3174,7 +3173,7 @@ export class DefaultApi {
      * @param body 
      * @param {*} [options] Override http request options.
      */
-    public setIoConfiguration(device: string, body: IoConfiguration, options: any = {}): Promise<{ response: http.ClientResponse; body?: any; }> {
+    public setIoConfiguration(device: string, body: IoConfiguration, options: any = {}): Promise<{ response: http.IncomingMessage; body?: any; }> {
         const localVarPath = this.basePath + '/api/v1/io/{device}/config'
             .replace('{' + 'device' + '}', encodeURIComponent(String(device)));
         let localVarQueryParameters: any = {};
@@ -3230,7 +3229,7 @@ export class DefaultApi {
                 localVarRequestOptions.form = localVarFormParams;
             }
         }
-        return new Promise<{ response: http.ClientResponse; body?: any; }>((resolve, reject) => {
+        return new Promise<{ response: http.IncomingMessage; body?: any; }>((resolve, reject) => {
             localVarRequest(localVarRequestOptions, (error, response, body) => {
                 if (error) {
                     reject(error);
@@ -3250,7 +3249,7 @@ export class DefaultApi {
      * @param body 
      * @param {*} [options] Override http request options.
      */
-    public setIoConfigurationOpCode(device: string, body: NumericValue, options: any = {}): Promise<{ response: http.ClientResponse; body?: any; }> {
+    public setIoConfigurationOpCode(device: string, body: NumericValue, options: any = {}): Promise<{ response: http.IncomingMessage; body?: any; }> {
         const localVarPath = this.basePath + '/api/v1/io/{device}/config/opcode'
             .replace('{' + 'device' + '}', encodeURIComponent(String(device)));
         let localVarQueryParameters: any = {};
@@ -3306,7 +3305,7 @@ export class DefaultApi {
                 localVarRequestOptions.form = localVarFormParams;
             }
         }
-        return new Promise<{ response: http.ClientResponse; body?: any; }>((resolve, reject) => {
+        return new Promise<{ response: http.IncomingMessage; body?: any; }>((resolve, reject) => {
             localVarRequest(localVarRequestOptions, (error, response, body) => {
                 if (error) {
                     reject(error);
@@ -3327,7 +3326,7 @@ export class DefaultApi {
      * @param body 
      * @param {*} [options] Override http request options.
      */
-    public setMmpValue(device: string, address: string, body: MmpNumericValue, options: any = {}): Promise<{ response: http.ClientResponse; body?: any; }> {
+    public setMmpValue(device: string, address: string, body: MmpNumericValue, options: any = {}): Promise<{ response: http.IncomingMessage; body?: any; }> {
         const localVarPath = this.basePath + '/api/v1/io/{device}/mmp/address/{address}'
             .replace('{' + 'device' + '}', encodeURIComponent(String(device)))
             .replace('{' + 'address' + '}', encodeURIComponent(String(address)));
@@ -3389,7 +3388,7 @@ export class DefaultApi {
                 localVarRequestOptions.form = localVarFormParams;
             }
         }
-        return new Promise<{ response: http.ClientResponse; body?: any; }>((resolve, reject) => {
+        return new Promise<{ response: http.IncomingMessage; body?: any; }>((resolve, reject) => {
             localVarRequest(localVarRequestOptions, (error, response, body) => {
                 if (error) {
                     reject(error);
@@ -3409,7 +3408,7 @@ export class DefaultApi {
      * @param body An array of values and address to write. The array must have between 1 and 256 elements. Otherwise, 400 is returned.
      * @param {*} [options] Override http request options.
      */
-    public setMmpValues(device: string, body: MmpGenericValues, options: any = {}): Promise<{ response: http.ClientResponse; body?: any; }> {
+    public setMmpValues(device: string, body: MmpGenericValues, options: any = {}): Promise<{ response: http.IncomingMessage; body?: any; }> {
         const localVarPath = this.basePath + '/api/v1/io/{device}/mmp/address'
             .replace('{' + 'device' + '}', encodeURIComponent(String(device)));
         let localVarQueryParameters: any = {};
@@ -3465,7 +3464,7 @@ export class DefaultApi {
                 localVarRequestOptions.form = localVarFormParams;
             }
         }
-        return new Promise<{ response: http.ClientResponse; body?: any; }>((resolve, reject) => {
+        return new Promise<{ response: http.IncomingMessage; body?: any; }>((resolve, reject) => {
             localVarRequest(localVarRequestOptions, (error, response, body) => {
                 if (error) {
                     reject(error);

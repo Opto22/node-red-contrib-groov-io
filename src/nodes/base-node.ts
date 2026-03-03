@@ -20,7 +20,6 @@ import * as ConfigHandler from "./config-node";
 // Import external modules
 import http = require('http');
 import * as NodeRed from '../../submodules/opto22-node-red-common/typings/nodered';
-import Promise = require('bluebird');
 import { DefaultApi } from "../swagger/lib/api";
 import MessageQueue from "../../submodules/opto22-node-red-common/src/MessageQueue";
 import { ErrorDetails } from "../util/error-handling";
@@ -44,7 +43,7 @@ export interface NodeBaseConfiguration extends NodeRed.NodeConfiguration {
 
 
 export interface PromiseResponse {
-    response: http.ClientResponse;
+    response: http.IncomingMessage;
     body: any; // Since we don't do anything much with the response bodies, we can ignore the type.
 }
 
