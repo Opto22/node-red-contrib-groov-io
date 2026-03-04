@@ -4,7 +4,6 @@ import https = require('https');
 import * as fs from 'fs';
 import * as path from 'path';
 import * as ApiLib from "../../src/swagger/lib/api";
-import { updateShorthandPropertyAssignment } from 'typescript';
 import { nextTick } from 'async';
 
 interface PromiseResponse {

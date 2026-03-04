@@ -13,7 +13,6 @@ module.exports = function(grunt) {
           target: "es6",
           sourceMap: false,
           noImplicitAny: false,
-          suppressImplicitAnyIndexErrors: true,
           fast: 'never'
         }
       },
@@ -29,7 +28,6 @@ module.exports = function(grunt) {
           target: "es6",
           sourceMap: false,
           noImplicitAny: false,
-          suppressImplicitAnyIndexErrors: true,
           fast: 'never'
         }
       }
