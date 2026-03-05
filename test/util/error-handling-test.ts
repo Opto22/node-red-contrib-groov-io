@@ -9,6 +9,8 @@ import * as http from 'http';
 import { ResponseErrorMessages, StatusCodeMessages, handleErrorResponse } from '../../src/util/error-handling';
 import * as process from 'process';
 import * as SemVer from 'semver';
+import { ClientTestUtil } from '../test-util/client-test-util';
+import * as ApiLib from "../../src/swagger/lib/api";
 
 
 describe('Error Handling', function () {
@@ -16,6 +18,17 @@ describe('Error Handling', function () {
     // Make sure that the handlers are ready to go.
     ReadNodeHandler.setRED(TestUtil.RED);
     ConfigHandler.setRED(TestUtil.RED);
+
+    before(function (beforeDone: MochaDone) {
+        ClientTestUtil.init(
+            (error: any, clientInfo?: { publicCertFile: Buffer, sharedApiClient: ApiLib.DefaultApi }) => {
+                if (error)
+                    assert.fail(error.toString());
+                else {
+                    beforeDone();
+                }
+            });
+    });
 
     describe('ResponseErrorMessages', function () {
 
