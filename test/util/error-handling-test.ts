@@ -149,6 +149,8 @@ describe('Error Handling', function () {
                     should(errorDetails.resError.statusCode).be.oneOf([401, 500]);
                     should(errorDetails.resError.body).be.a.type('string');
 
+                    // console.log(`errorObj: ${JSON.stringify(errorDetails, undefined, 2)}`)
+
                     // Check that the node's status was set.
                     should(node.getStatus()).be.oneOf([
                         {
@@ -219,7 +221,10 @@ describe('Error Handling', function () {
                     should(errorDetails.reqError.syscall).be.eql('getaddrinfo');
                     should(errorDetails.reqError.hostname).be.eql('999.999.999.999');
                     should(errorDetails.reqError.code).be.oneOf(['ENOTFOUND', 'EAI_AGAIN']);
-                    // console.log(`errorObj: ${JSON.stringify(errorObj, undefined, 2)}`)
+                    should(errorDetails.reqError.errno).be.oneOf([-3001]);; // might be other codes possible; please add if found
+                    should(errorDetails.reqError.syscall).be.eql('getaddrinfo');
+
+                    // console.log(`errorObj: ${JSON.stringify(errorDetails, undefined, 2)}`)
 
                     // Check that the node's status was set.
                     should(node.getStatus()).match({
