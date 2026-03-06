@@ -48,7 +48,7 @@ describe('Error Handling', function () {
             });
         });
 
-        it('returns a proper message for an known error code', function () {
+        it('returns a proper message for a known error code', function () {
             var errorMsg = ResponseErrorMessages.getErrorMsg({ code: 'ETIMEDOUT' });
             should(errorMsg).match({
                 nodeShortErrorMsg: 'Timeout',
@@ -56,7 +56,7 @@ describe('Error Handling', function () {
             });
         });
 
-        it('returns a proper message for an given reason', function () {
+        it('returns a proper message for a given reason', function () {
             var errorMsg = ResponseErrorMessages.getErrorMsg({ reason: 'the reason' });
             should(errorMsg).match({
                 nodeShortErrorMsg: 'the reason',
@@ -64,7 +64,7 @@ describe('Error Handling', function () {
             });
         });
 
-        it('returns a proper message for an known error code with a syscall detail', function () {
+        it('returns a proper message for a known error code with a syscall detail', function () {
             var errorMsg = ResponseErrorMessages.getErrorMsg({ code: 'ETIMEDOUT', syscall: 'some_sys_call' });
             should(errorMsg).match({
                 nodeShortErrorMsg: 'Timeout',
@@ -130,17 +130,24 @@ describe('Error Handling', function () {
                     assert.fail(); // should never get here.
                 },
                 (errorText: string, nodeMsg: any) => {
-                    // Check that the error was sent to the node.
+                    // console.log(`nodeMsg: ${JSON.stringify(nodeMsg, undefined, 2)}`)
 
-                    should(errorSpy.firstCall.args[0]).be.oneOf([
+                    // Test some of the error object's details.
+                    // This is the data we send to node.error(), which is attached
+                    // to the original incoming message and sent to Catch nodes.
+                    // Some details aren't consistent between OSes or versions of Node.js,
+                    // so don't be too picky.
+                    var errorMsg = nodeErrorSpy.firstCall.args[0];
+                    var errorDetails = nodeErrorSpy.firstCall.args[1];
+
+                    should(errorMsg).be.oneOf([
                         'Bad API key or server error. HTTP response error : 500', // Auth v1
                         'Bad API key. HTTP response error : 401' // Auth v2
                     ]);
 
-
-                    // Confirm the REQUEST error
-                    should(errorSpy.firstCall.args[1].resError.statusCode).be.oneOf([401, 500]);
-                    should(errorSpy.firstCall.args[1].resError.body).be.a.type('string');
+                    // Confirm the REQUEST error ("resError" is response from the request)
+                    should(errorDetails.resError.statusCode).be.oneOf([401, 500]);
+                    should(errorDetails.resError.body).be.a.type('string');
 
                     // Check that the node's status was set.
                     should(node.getStatus()).be.oneOf([
@@ -155,14 +162,14 @@ describe('Error Handling', function () {
                             text: 'Bad API key'
                         }]);
 
-                    errorSpy.restore();
-                    statusSpy.restore();
+                    nodeErrorSpy.restore();
+                    nodeStatusSpy.restore();
                     done();
                 });
 
-            // Attach some spies to the node.
-            var errorSpy = sinon.spy(node, 'error');
-            var statusSpy = sinon.spy(node, 'status');
+            // Attach some spies to the node's standard functions.
+            var nodeErrorSpy = sinon.spy(node, 'error');
+            var nodeStatusSpy = sinon.spy(node, 'status');
 
             // Send a msg to the Read node.
             TestUtil.injectTimestampMsg(node);
@@ -194,21 +201,25 @@ describe('Error Handling', function () {
                     assert.fail(); // should never get here.
                 },
                 (errorText: string, nodeMsg: any) => {
-                    // Check that the error was sent to the node.
+                    // console.log(`nodeMsg: ${JSON.stringify(nodeMsg, undefined, 2)}`)
 
-                    // Node keeps changing the error object details.
-                    should(errorSpy.firstCall.args[0]).be.oneOf([
+                    // Test some of the error object's details.
+                    // This is the data we send to node.error(), which is attached
+                    // to the original incoming message and sent to Catch nodes.
+                    // Some details aren't consistent between OSes or versions of Node.js,
+                    // so don't be too picky.
+                    var errorMsg = nodeErrorSpy.firstCall.args[0];
+                    var errorDetails = nodeErrorSpy.firstCall.args[1];
+
+                    should(errorMsg).be.oneOf([
                         'Address not found. Error code: ENOTFOUND from system call "getaddrinfo"',
                         'Address not found. Error code: EAI_AGAIN from system call "getaddrinfo"'
                     ]);
 
-                    // Test some of the error object's details.
-                    // These aren't consistent between OSes or versions of Node.js,
-                    // so don't be too picky.
-                    var errorObj = errorSpy.firstCall.args[1].reqError;
-                    should(errorObj.syscall).be.eql('getaddrinfo');
-                    should(errorObj.hostname).be.eql('999.999.999.999');
-                    should(errorObj.code).be.oneOf(['ENOTFOUND', 'EAI_AGAIN']);
+                    should(errorDetails.reqError.syscall).be.eql('getaddrinfo');
+                    should(errorDetails.reqError.hostname).be.eql('999.999.999.999');
+                    should(errorDetails.reqError.code).be.oneOf(['ENOTFOUND', 'EAI_AGAIN']);
+                    // console.log(`errorObj: ${JSON.stringify(errorObj, undefined, 2)}`)
 
                     // Check that the node's status was set.
                     should(node.getStatus()).match({
@@ -217,14 +228,14 @@ describe('Error Handling', function () {
                         text: 'Address not found' // Yes, the Auth service is returning a 500, not a 403.
                     });
 
-                    errorSpy.restore();
-                    statusSpy.restore();
+                    nodeErrorSpy.restore();
+                    nodeStatusSpy.restore();
                     done();
                 });
 
-            // Attach some spies to the node.
-            var errorSpy = sinon.spy(node, 'error');
-            var statusSpy = sinon.spy(node, 'status');
+            // Attach some spies to the node's standard functions.
+            var nodeErrorSpy = sinon.spy(node, 'error');
+            var nodeStatusSpy = sinon.spy(node, 'status');
 
             // Send a msg to the Read node.
             TestUtil.injectTimestampMsg(node);
