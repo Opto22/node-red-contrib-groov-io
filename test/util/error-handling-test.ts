@@ -242,5 +242,75 @@ describe('Error Handling', function () {
             TestUtil.injectTimestampMsg(node);
         });
 
+        it("a real-world error (no certificate) sets the node's status and request error", function (done) {
+
+            this.timeout(10000);
+
+            // Using a Read node, attempt to use a device with an incorrect
+            // API Key. An error will be returned and the node should have its
+            // status and error set.
+
+            // Device setup
+            var deviceConfig = TestUtil.createDeviceConfig();
+            deviceConfig.credentials.caCertPath = 'bad-file-haha.pem';
+            TestUtil.RED.nodes.addCredentials('deviceId0', deviceConfig.credentials);
+
+            var deviceConfigNode = TestUtil.createDeviceConfigNode(deviceConfig);
+            ConfigHandler.createDeviceNode.call(deviceConfigNode, deviceConfig);
+
+            // Create a Read node.
+            var node = TestUtil.createNewFullReadNode(deviceConfig.id,
+                {
+                    dataType: 'channel-digital',
+                    moduleIndex: RackInfo.di.index.toString(),
+                    channelIndex: '6'
+                },
+                (msg: any) => {
+                    assert.fail(); // should never get here.
+                },
+                (errorMsg: string, errorDetails: any) => {
+                    // console.log(`errorMsg: ${errorMsg}`)
+                    // console.log(`errorDetails: ${JSON.stringify(errorDetails, undefined, 2)}`)
+
+                    // Do the actual testing after the event loop cycles.
+                    // There are try/catch blocks somewhere that will eat the assertions.
+                    // This can happen when testing the error handling.
+                    process.nextTick(() => {
+
+                        // Test some of the error object's details.
+                        // This is the data we send to node.error(), which is attached
+                        // to the original incoming message and sent to Catch nodes.
+                        // Some details aren't consistent between OSes or versions of Node.js,
+                        // so don't be too picky.
+
+                        should(errorMsg).be.oneOf([
+                            'There is a problem with the SSL public certificate for the target device. ' +
+                            'It may not be installed in this device or it may not match the private key ' +
+                            'in the target device. Error code: DEPTH_ZERO_SELF_SIGNED_CERT',
+                        ]);
+
+                        should(errorDetails.reqError.code).be.oneOf(['DEPTH_ZERO_SELF_SIGNED_CERT']);
+                        should(errorDetails.reqError.syscall).be.undefined;
+                        should(errorDetails.reqError.hostname).be.undefined;
+                        should(errorDetails.reqError.errno).be.undefined;
+                        should(errorDetails.reqError.syscall).be.undefined;
+
+                        // // console.log(`errorObj: ${JSON.stringify(errorDetails, undefined, 2)}`)
+
+                        // Check that the node's status was set.
+                        should(node.getStatus()).match({
+                            fill: "red",
+                            shape: "dot",
+                            text: 'Security certificate problem'
+                        });
+
+                        done();
+                    });
+                });
+
+            // Send a msg to the Read node.
+            TestUtil.injectTimestampMsg(node);
+        });
+
     });
 });
