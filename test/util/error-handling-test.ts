@@ -129,49 +129,47 @@ describe('Error Handling', function () {
                 (msg: any) => {
                     assert.fail(); // should never get here.
                 },
-                (errorText: string, nodeMsg: any) => {
+                (errorMsg: string, errorDetails: any) => {
                     // console.log(`nodeMsg: ${JSON.stringify(nodeMsg, undefined, 2)}`)
 
-                    // Test some of the error object's details.
-                    // This is the data we send to node.error(), which is attached
-                    // to the original incoming message and sent to Catch nodes.
-                    // Some details aren't consistent between OSes or versions of Node.js,
-                    // so don't be too picky.
-                    var errorMsg = nodeErrorSpy.firstCall.args[0];
-                    var errorDetails = nodeErrorSpy.firstCall.args[1];
+                    // Do the actual testing after the event loop cycles.
+                    // There are try/catch blocks somewhere that will eat the assertions.
+                    // This can happen when testing the error handling.
+                    process.nextTick(() => {
 
-                    should(errorMsg).be.oneOf([
-                        'Bad API key or server error. HTTP response error : 500', // Auth v1
-                        'Bad API key. HTTP response error : 401' // Auth v2
-                    ]);
+                        // Test some of the error object's details.
+                        // This is the data we send to node.error(), which is attached
+                        // to the original incoming message and sent to Catch nodes.
+                        // Some details aren't consistent between OSes or versions of Node.js,
+                        // so don't be too picky.
 
-                    // Confirm the REQUEST error ("resError" is response from the request)
-                    should(errorDetails.resError.statusCode).be.oneOf([401, 500]);
-                    should(errorDetails.resError.body).be.a.type('string');
+                        should(errorMsg).be.oneOf([
+                            'Bad API key or server error. HTTP response error : 500', // Auth v1
+                            'Bad API key. HTTP response error : 401' // Auth v2
+                        ]);
 
-                    // console.log(`errorObj: ${JSON.stringify(errorDetails, undefined, 2)}`)
+                        // Confirm the REQUEST error ("resError" is response from the request)
+                        should(errorDetails.resError.statusCode).be.oneOf([401, 500]);
+                        should(errorDetails.resError.body).be.a.type('string');
 
-                    // Check that the node's status was set.
-                    should(node.getStatus()).be.oneOf([
-                        {
-                            fill: "red",
-                            shape: "dot",
-                            text: 'Bad API key or server error' // Yes, the Auth v1 service is returning a 500, not a 401.
-                        },
-                        {
-                            fill: "red",
-                            shape: "dot",
-                            text: 'Bad API key'
-                        }]);
+                        // console.log(`errorObj: ${JSON.stringify(errorDetails, undefined, 2)}`)
 
-                    nodeErrorSpy.restore();
-                    nodeStatusSpy.restore();
-                    done();
+                        // Check that the node's status was set.
+                        should(node.getStatus()).be.oneOf([
+                            {
+                                fill: "red",
+                                shape: "dot",
+                                text: 'Bad API key or server error' // Yes, the Auth v1 service is returning a 500, not a 401.
+                            },
+                            {
+                                fill: "red",
+                                shape: "dot",
+                                text: 'Bad API key'
+                            }]);
+
+                        done();
+                    });
                 });
-
-            // Attach some spies to the node's standard functions.
-            var nodeErrorSpy = sinon.spy(node, 'error');
-            var nodeStatusSpy = sinon.spy(node, 'status');
 
             // Send a msg to the Read node.
             TestUtil.injectTimestampMsg(node);
@@ -202,45 +200,43 @@ describe('Error Handling', function () {
                 (msg: any) => {
                     assert.fail(); // should never get here.
                 },
-                (errorText: string, nodeMsg: any) => {
+                (errorMsg: string, errorDetails: any) => {
                     // console.log(`nodeMsg: ${JSON.stringify(nodeMsg, undefined, 2)}`)
 
-                    // Test some of the error object's details.
-                    // This is the data we send to node.error(), which is attached
-                    // to the original incoming message and sent to Catch nodes.
-                    // Some details aren't consistent between OSes or versions of Node.js,
-                    // so don't be too picky.
-                    var errorMsg = nodeErrorSpy.firstCall.args[0];
-                    var errorDetails = nodeErrorSpy.firstCall.args[1];
+                    // Do the actual testing after the event loop cycles.
+                    // There are try/catch blocks somewhere that will eat the assertions.
+                    // This can happen when testing the error handling.
+                    process.nextTick(() => {
 
-                    should(errorMsg).be.oneOf([
-                        'Address not found. Error code: ENOTFOUND from system call "getaddrinfo"',
-                        'Address not found. Error code: EAI_AGAIN from system call "getaddrinfo"'
-                    ]);
+                        // Test some of the error object's details.
+                        // This is the data we send to node.error(), which is attached
+                        // to the original incoming message and sent to Catch nodes.
+                        // Some details aren't consistent between OSes or versions of Node.js,
+                        // so don't be too picky.
 
-                    should(errorDetails.reqError.syscall).be.eql('getaddrinfo');
-                    should(errorDetails.reqError.hostname).be.eql('999.999.999.999');
-                    should(errorDetails.reqError.code).be.oneOf(['ENOTFOUND', 'EAI_AGAIN']);
-                    should(errorDetails.reqError.errno).be.oneOf([-3001]);; // might be other codes possible; please add if found
-                    should(errorDetails.reqError.syscall).be.eql('getaddrinfo');
+                        should(errorMsg).be.oneOf([
+                            'Address not found. Error code: ENOTFOUND from system call "getaddrinfo"',
+                            'Address not found. Error code: EAI_AGAIN from system call "getaddrinfo"'
+                        ]);
 
-                    // console.log(`errorObj: ${JSON.stringify(errorDetails, undefined, 2)}`)
+                        should(errorDetails.reqError.syscall).be.eql('getaddrinfo');
+                        should(errorDetails.reqError.hostname).be.eql('999.999.999.999');
+                        should(errorDetails.reqError.code).be.oneOf(['ENOTFOUND', 'EAI_AGAIN']);
+                        should(errorDetails.reqError.errno).be.oneOf([-3001]);; // might be other codes possible; please add if found
+                        should(errorDetails.reqError.syscall).be.eql('getaddrinfo');
 
-                    // Check that the node's status was set.
-                    should(node.getStatus()).match({
-                        fill: "red",
-                        shape: "dot",
-                        text: 'Address not found' // Yes, the Auth service is returning a 500, not a 403.
+                        // console.log(`errorObj: ${JSON.stringify(errorDetails, undefined, 2)}`)
+
+                        // Check that the node's status was set.
+                        should(node.getStatus()).match({
+                            fill: "red",
+                            shape: "dot",
+                            text: 'Address not found' // Yes, the Auth service is returning a 500, not a 403.
+                        });
+
+                        done();
                     });
-
-                    nodeErrorSpy.restore();
-                    nodeStatusSpy.restore();
-                    done();
                 });
-
-            // Attach some spies to the node's standard functions.
-            var nodeErrorSpy = sinon.spy(node, 'error');
-            var nodeStatusSpy = sinon.spy(node, 'status');
 
             // Send a msg to the Read node.
             TestUtil.injectTimestampMsg(node);
