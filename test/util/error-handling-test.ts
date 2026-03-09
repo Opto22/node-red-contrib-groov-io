@@ -105,6 +105,75 @@ describe('Error Handling', function () {
     describe('handleErrorResponse()', function () {
 
 
+        it("a real-world error (404 for invalid module #) sets the node's status and response error", function (done) {
+
+            // Using a Read node, attempt to use a device with an incorrect
+            // API Key. An error will be returned and the node should have its
+            // status and error set.
+
+            // Device setup
+            var deviceConfig = TestUtil.createDeviceConfig();
+            TestUtil.RED.nodes.addCredentials('deviceId0', deviceConfig.credentials);
+
+            var deviceConfigNode = TestUtil.createDeviceConfigNode(deviceConfig);
+            ConfigHandler.createDeviceNode.call(deviceConfigNode, deviceConfig);
+
+            // Create a Read node.
+            var node = TestUtil.createNewFullReadNode(deviceConfig.id,
+                {
+                    dataType: 'channel-digital',
+                    moduleIndex: '22', // whoops, that's too big. That resource won't exist.
+                    channelIndex: '6'
+                },
+                (msg: any) => {
+                    assert.fail(); // should never get here.
+                },
+                (errorMsg: string, errorDetails: any) => {
+                    // console.log(`errorMsg: ${errorMsg}`)
+                    // console.log(`errorDetails: ${JSON.stringify(errorDetails, undefined, 2)}`)
+
+                    // Do the actual testing after the event loop cycles.
+                    // There are try/catch blocks somewhere that will eat the assertions.
+                    // This can happen when testing the error handling.
+                    process.nextTick(() => {
+
+                        // Test some of the error object's details.
+                        // This is the data we send to node.error(), which is attached
+                        // to the original incoming message and sent to Catch nodes.
+                        // Some details aren't consistent between OSes or versions of Node.js,
+                        // so don't be too picky.
+
+                        should(errorMsg).be.oneOf([
+                            'Not found. HTTP response error : 404'
+                        ]);
+
+                        // Confirm the REQUEST error ("resError" is response from the request)
+                        should(errorDetails.resError.statusCode).be.eql(404);
+                        should(errorDetails.resError.body).be.a.type('object');
+                        should(errorDetails.resError.body).be.eql({
+                            "error": {
+                                "message": "Invalid module index"
+                            }
+                        });
+
+                        // console.log(`node.getStatus(): ${JSON.stringify(node.getStatus(), undefined, 1)}`)
+
+                        // Check that the node's status was set.
+                        should(node.getStatus()).be.oneOf([
+                            {
+                                fill: "red",
+                                shape: "dot",
+                                text: 'Not found'
+                            }]);
+
+                        done();
+                    });
+                });
+
+            // Send a msg to the Read node.
+            TestUtil.injectTimestampMsg(node);
+        });
+
         it("a real-world error (invalid API key) sets the node's status and response error", function (done) {
 
             // Using a Read node, attempt to use a device with an incorrect
