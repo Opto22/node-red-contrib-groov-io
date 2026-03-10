@@ -34,7 +34,7 @@ export interface UserFullData {
 
 
 export class ClientTestUtil {
-    static sharedApiClient: ApiLib.DefaultApi | undefined;
+    static sharedApiClient: ApiLib.DefaultApi;
     static publicCertFile: Buffer;
     static caCertFile: Buffer;
     static caCertPath: string;

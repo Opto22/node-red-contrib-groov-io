@@ -7,7 +7,7 @@ import * as should from 'should';
 import * as async from 'async';
 import * as TestUtil from "./test-util/test-util";
 import { RackInfo } from "./test-util/rack-info";
-import { WriteNodeImpl } from '../src/nodes/write-node';
+import { NodeWriteConfiguration, WriteNodeImpl } from '../src/nodes/write-node';
 import * as WriteNodeHandler from "../src/nodes/write-node";
 import * as sinon from 'sinon';
 import { ClientTestUtil } from './test-util/client-test-util';
@@ -88,7 +88,7 @@ describe('Groov I/O Write Nodes', function () {
         ) {
 
             var channelIndex = 3;
-            var onNodeConfig = {
+            var onNodeConfig: Partial<NodeWriteConfiguration> = {
                 dataType: 'channel-digital',
                 moduleIndex: RackInfo.do.index.toString(),
                 channelIndex: channelIndex.toString(),
@@ -114,7 +114,7 @@ describe('Groov I/O Write Nodes', function () {
                 // Use the client lib to turn ON the channel
                 (next: (err?: Error) => void) => {
                     ClientTestUtil.sharedApiClient.setDigitalChannelState('local', RackInfo.do.index, channelIndex, { value: true }).then(
-                        (fullfilledResponse: { response: http.IncomingMessage; body: ApiLib.DigitalChannelRead; }) => {
+                        (fullfilledResponse: { response: http.IncomingMessage; body?: ApiLib.DigitalChannelRead; }) => {
                             next();
                         });
                 },
@@ -222,9 +222,14 @@ describe('Groov I/O Write Nodes', function () {
                 (next: () => void) => {
                     TestUtil.getDigitalInput(RackInfo.di.index, channelIndex,
                         (err: any, status?: ApiLib.DigitalChannelRead) => {
-                            should(status.onLatchState).be.true();
-                            should(status.offLatchState).be.true();
-                            next();
+                            if (status) {
+                                should(status.onLatchState).be.true();
+                                should(status.offLatchState).be.true();
+                                next();
+                            }
+                            else {
+                                assert.fail();
+                            }
                         });
                 },
                 // Use the Write node to turn ON the channel
@@ -237,9 +242,14 @@ describe('Groov I/O Write Nodes', function () {
                 (next: () => void) => {
                     TestUtil.getDigitalInput(RackInfo.di.index, channelIndex,
                         (err: any, status?: ApiLib.DigitalChannelRead) => {
-                            should(status.onLatchState).be.false(); // NOW IS FALSE
-                            should(status.offLatchState).be.true();
-                            next();
+                            if (status) {
+                                should(status.onLatchState).be.false(); // NOW IS FALSE
+                                should(status.offLatchState).be.true();
+                                next();
+                            }
+                            else {
+                                assert.fail();
+                            }
                         });
                 },
                 // Use the Write node to turn OFF the channel
@@ -252,9 +262,14 @@ describe('Groov I/O Write Nodes', function () {
                 (next: () => void) => {
                     TestUtil.getDigitalInput(RackInfo.di.index, channelIndex,
                         (err: any, status?: ApiLib.DigitalChannelRead) => {
-                            should(status.onLatchState).be.false();
-                            should(status.offLatchState).be.false(); // NOW IS FALSE
-                            next();
+                            if (status) {
+                                should(status.onLatchState).be.false();
+                                should(status.offLatchState).be.false(); // NOW IS FALSE
+                                next();
+                            }
+                            else {
+                                assert.fail();
+                            }
                         });
                 },
             ],
@@ -438,9 +453,15 @@ describe('Groov I/O Write Nodes', function () {
                         (err: any, value?: number, fullModel?: ApiLib.AnalogChannelRead) => {
                             if (err) { next(err); return; }
                             should(value).be.approximately(5.0, 0.3);
-                            should(fullModel.minValue).be.approximately(5.0, 0.3);
-                            should(fullModel.maxValue).be.approximately(5.0, 0.3);
-                            next();
+                            if (fullModel) {
+                                should(fullModel.minValue).be.approximately(5.0, 0.3);
+                                should(fullModel.maxValue).be.approximately(5.0, 0.3);
+                                next();
+                            }
+                            else {
+                                assert.fail()
+
+                            }
                         });
                 },
             ],
@@ -600,7 +621,7 @@ describe('Groov I/O Write Nodes', function () {
                 // Use the client lib to turn ON the channel
                 (next: (err?: Error) => void) => {
                     ClientTestUtil.sharedApiClient.setDigitalChannelState('local', RackInfo.do.index, channelIndex, { value: true }).then(
-                        (fullfilledResponse: { response: http.IncomingMessage; body: ApiLib.DigitalChannelRead; }) => {
+                        (fullfilledResponse: { response: http.IncomingMessage; body?: ApiLib.DigitalChannelRead; }) => {
                             next();
                         });
                 },

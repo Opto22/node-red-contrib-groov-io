@@ -21,8 +21,8 @@ function log(msg: string) {
 
 class AsyncIoTestHelper {
     public msgCount = 0;
-    public inputNodeImpl: InputNodeHandler.InputNodeImpl;
-    public inputNode: MockGroovInputNode;
+    public inputNodeImpl!: InputNodeHandler.InputNodeImpl;
+    public inputNode!: MockGroovInputNode;
 
     constructor(
         public deviceConfig: ConfigHandler.DeviceConfiguration,
@@ -119,7 +119,9 @@ class AsyncIoTestHelper {
             should(this.msgCount).be.eql(expectedMsgCount);
 
             if (done) {
-                this.inputNode.onClose();
+                if (this.inputNode.onClose) {
+                    this.inputNode.onClose();
+                }
                 done();
             }
         });
@@ -139,7 +141,9 @@ class AsyncIoTestHelper {
             should(this.msgCount).be.eql(expectedMsgCount);
 
             if (done) {
-                this.inputNode.onClose();
+                if (this.inputNode.onClose) {
+                    this.inputNode.onClose();
+                }
                 done();
             }
         });
@@ -246,7 +250,7 @@ describe('Groov I/O Input Nodes', function () {
                 (next: () => void) => { setTimeout(next, 500); },
                 // Turn off the output 
                 (next: () => void) => { asyncTestHelper.turnDigitalOff(next) }
-            ], (err?: Error) => {
+            ], (err: Error | undefined | null) => {
                 should(err).be.null();
             });
         });
@@ -296,7 +300,7 @@ describe('Groov I/O Input Nodes', function () {
                 (next: () => void) => { asyncTestHelper.turnDigitalOff(next) },
                 // Force a scan
                 (next: () => void) => { asyncTestHelper.forceScan(next); },
-            ], (err?: Error) => {
+            ], (err?: Error | undefined | null) => {
                 asyncTestHelper.closeNode();
                 should(err).be.null();
             });
@@ -343,7 +347,7 @@ describe('Groov I/O Input Nodes', function () {
                 (next: () => void) => { asyncTestHelper.turnDigitalOn(next) },
                 // Force a scan
                 (next: () => void) => { asyncTestHelper.forceScan(next); },
-            ], (err?: Error) => {
+            ], (err?: Error | undefined | null) => {
                 asyncTestHelper.closeNode();
                 should(err).be.null();
             });
@@ -395,7 +399,7 @@ describe('Groov I/O Input Nodes', function () {
                 (next: () => void) => { asyncTestHelper.turnDigitalOff(next) },
                 // Force a scan
                 (next: () => void) => { asyncTestHelper.forceScan(next); },
-            ], (err?: Error) => {
+            ], (err?: Error | undefined | null) => {
                 asyncTestHelper.closeNode();
                 should(err).be.null();
             });
@@ -465,7 +469,7 @@ describe('Groov I/O Input Nodes', function () {
                 // Force a scan (on-latch is set again.)
                 (next: () => void) => { asyncTestHelper.forceScan(next); },
             ],
-                (err?: Error) => {
+                (err?: Error | undefined | null) => {
 
                     should(err).be.null();
                 });
@@ -539,7 +543,7 @@ describe('Groov I/O Input Nodes', function () {
                 // Force a scan (just the off-latch is set again.)
                 (next: () => void) => { asyncTestHelper.forceScan(next); },
             ],
-                (err?: Error) => {
+                (err?: Error | undefined | null) => {
                     asyncTestHelper.closeNode();
                     should(err).be.null();
                 });
@@ -574,7 +578,7 @@ describe('Groov I/O Input Nodes', function () {
                 (next: () => void) => { asyncTestHelper.setAnalogValue(testValue, next) },
                 // Force a scan
                 (next: () => void) => { asyncTestHelper.forceScan(next); },
-            ], (err?: Error) => {
+            ], (err?: Error | undefined | null) => {
                 should(err).be.null();
             });
         });
@@ -618,7 +622,7 @@ describe('Groov I/O Input Nodes', function () {
                 (next: () => void) => { asyncTestHelper.setAnalogValue(testValue2, next) },
                 // Force a scan
                 (next: () => void) => { asyncTestHelper.forceScan(next); },
-            ], (err?: Error) => {
+            ], (err?: Error | undefined | null) => {
                 should(err).be.null();
             });
         });
