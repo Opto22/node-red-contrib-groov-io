@@ -1,4 +1,4 @@
-import localVarRequest = require('request');
+import * as localVarRequest from 'request';
 import * as http from 'http';
 import * as https from 'https';
 import * as fs from 'fs';

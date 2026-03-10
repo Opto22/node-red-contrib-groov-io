@@ -1,4 +1,4 @@
-import http = require('http');
+import * as http from 'http';
 import * as assert from 'assert';
 import * as NodeHandlers from "../src/nodes/base-node";
 import * as ConfigHandler from "../src/nodes/config-node";
