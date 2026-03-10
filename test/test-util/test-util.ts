@@ -38,7 +38,8 @@ export function createDeviceConfig(address?: string): ConfigHandler.DeviceConfig
 
 export function createDeviceConfigNode(deviceConfig: ConfigHandler.DeviceConfiguration): MockGroovIoDeviceNode {
 
-    var deviceConfigNode = new MockGroovIoDeviceNode(deviceConfig.id, deviceConfig.address, deviceConfig.credentials);
+    var deviceConfigNode = new MockGroovIoDeviceNode(deviceConfig.id, deviceConfig.address,
+        deviceConfig.credentials, deviceConfig.msgQueueFullBehavior);
 
     RED.nodes.addNode(deviceConfigNode);
 

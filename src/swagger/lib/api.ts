@@ -641,8 +641,8 @@ export class DefaultApi {
     protected defaultHeaders: any = {};
     protected _useQuerystring: boolean = false;
     protected apiKey: string;
-    protected publicCertFile: Buffer;
-    protected caCertFile: Buffer;
+    protected publicCertFile?: Buffer;
+    protected caCertFile?: Buffer;
     protected isLocalhost: boolean;
     protected httpsAgent: https.Agent = new https.Agent({
         keepAlive: true,
@@ -655,7 +655,7 @@ export class DefaultApi {
     protected authentications = {
     }
 
-    constructor(address: string, apiKey: string, publicCertFile: Buffer, caCertFile: Buffer) {
+    constructor(address: string, apiKey: string, publicCertFile: Buffer | undefined, caCertFile: Buffer | undefined) {
         this.address = address;
         this._basePath = 'https://' + address + '/manage';
         this.apiKey = apiKey;

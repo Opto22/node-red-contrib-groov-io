@@ -4,6 +4,7 @@ import * as NodeHandlers from "../../src/nodes/base-node";
 import { WriteNodeImpl } from '../../src/nodes/write-node';
 import { ReadNodeImpl } from '../../src/nodes/read-node';
 import { InputNodeImpl } from '../../src/nodes/input-node';
+import { FullQueueBehaviorType } from '../../submodules/opto22-node-red-common/src/MessageQueue';
 
 export class MockNodeEx extends MockNode {
 
@@ -52,7 +53,7 @@ export class MockGroovWriteNode extends MockNodeEx {
 export class MockGroovIoDeviceNode extends MockNodeEx implements ConfigHandler.DeviceConfiguration {
     address: string;
     credentials: ConfigHandler.DeviceCredentials;
-    msgQueueFullBehavior: 'REJECT_NEW';
+    msgQueueFullBehavior: FullQueueBehaviorType;
 
     constructor(id: string,
         address: string,
@@ -61,10 +62,12 @@ export class MockGroovIoDeviceNode extends MockNodeEx implements ConfigHandler.D
                 apiKey: string,
                 publicCertPath: string,
                 caCertPath: string,
-            }) {
+            },
+        msgQueueFullBehavior: FullQueueBehaviorType) {
         super(ConfigHandler.GroovIoDeviceNodeType);
         this.id = id;
         this.address = address;
         this.credentials = credentials;
+        this.msgQueueFullBehavior = msgQueueFullBehavior;
     }
 }

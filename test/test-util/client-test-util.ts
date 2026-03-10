@@ -1,6 +1,6 @@
 import localVarRequest = require('request');
-import http = require('http');
-import https = require('https');
+import * as http from 'http';
+import * as https from 'https';
 import * as fs from 'fs';
 import * as path from 'path';
 import * as ApiLib from "../../src/swagger/lib/api";
@@ -13,7 +13,7 @@ interface PromiseResponse {
 
 var TestSettings = require('../settings.json');
 
-export class UserFullData {
+export interface UserFullData {
     username: string;
     apiKey: string;
     email: string;
@@ -35,7 +35,7 @@ export class UserFullData {
 
 export class ClientTestUtil {
     static sharedApiClient: ApiLib.DefaultApi | undefined;
-    static publicCertFile ;
+    static publicCertFile: Buffer;
     static caCertFile: Buffer;
     static caCertPath: string;
     static userData: UserFullData | undefined;
@@ -61,7 +61,7 @@ export class ClientTestUtil {
 
                     // Also need to write out the file. The node will want to read 
                     // it itself.
-                    ClientTestUtil.caCertPath = path.join(process.cwd(),'temp', 'caCertFile.pem');
+                    ClientTestUtil.caCertPath = path.join(process.cwd(), 'temp', 'caCertFile.pem');
 
                     fs.writeFileSync(ClientTestUtil.caCertPath, clientInfo.certFile, 'utf8');
                 }
