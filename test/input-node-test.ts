@@ -71,7 +71,7 @@ class AsyncIoTestHelper {
     setMsgCallback(msgCallback: (msg: any) => void) {
         // Replace the callback
         this.msgCallback = msgCallback;
-    } clearDigital
+    }
 
     forceScan = (next: () => void) => {
         log('forceScan');

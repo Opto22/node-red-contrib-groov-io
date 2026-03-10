@@ -29,7 +29,7 @@ export function createDeviceConfig(address?: string): ConfigHandler.DeviceConfig
         address: address !== undefined ? address : TestSettings.groovAddress,
         msgQueueFullBehavior: 'REJECT_NEW',
         credentials: {
-            apiKey: ClientTestUtil.userData.apiKey,
+            apiKey: ClientTestUtil.userData!.apiKey,
             publicCertPath: '',
             caCertPath: ClientTestUtil.caCertPath || '',
         }
@@ -190,7 +190,7 @@ export function createFullInputNode(deviceId: string,
         id: "930e8d11.9abbf", // This is just an example ID. Nothing special about it.
         type: InputNodeImpl.getNodeType(),
         device: deviceId,
-        dataType: nodeConfigPartial.dataType,
+        dataType: nodeConfigPartial.dataType || 'mmp-address',
         sendInitialValue: nodeConfigPartial.sendInitialValue || false,
         deadband: nodeConfigPartial.deadband || '1',
         scanTimeSec: nodeConfigPartial.scanTimeSec || '1',
@@ -207,7 +207,7 @@ export function createFullInputNode(deviceId: string,
     var node = createRawInputNode(deviceId, nodeConfigPartial,
         onSendCallback, onErrorCallback);
 
-    var nodeImpl = createInputNode.call(node, nodeConfig, true);
+    var nodeImpl = <InputNodeImpl>(createInputNode.call(node, nodeConfig, true));
 
     return { node, nodeImpl };
 }
@@ -224,7 +224,7 @@ export function createRawInputNode(deviceId: string, nodeConfigPartial: Partial<
 
 export function createRawReadNode(
     onSendCallback: (msg: any) => void,
-    onErrorCallback: (errorText: string, nodeMessage: any) => void): MockGroovReadNode {
+    onErrorCallback?: (errorText: string, nodeMessage: any) => void): MockGroovReadNode {
 
     // Create a mock node.
     var node = new MockGroovReadNode(onSendCallback, onErrorCallback);
@@ -257,7 +257,7 @@ export function createNewFullReadNode(deviceId: string, nodeConfigPartial: Parti
         id: "930e8d11.9abbf",
         type: ReadNodeImpl.getNodeType(),
         device: deviceId,
-        dataType: nodeConfigPartial.dataType,
+        dataType: nodeConfigPartial.dataType || 'mmp-address',
         valueType: nodeConfigPartial.valueType || 'msg.payload',
         value: nodeConfigPartial.value || '',
         topicType: nodeConfigPartial.topicType || 'none',
@@ -298,7 +298,7 @@ export function getFullWriteNodeConfigFromPartial(
         id: "930e8d11.9abbf", // This is just an example ID. Nothing special about it.
         type: WriteNodeImpl.getNodeType(),
         device: deviceId || '',
-        dataType: nodeConfigPartial.dataType,
+        dataType: nodeConfigPartial.dataType || 'channel-config',
         valueType: nodeConfigPartial.valueType || 'msg.payload',
         value: nodeConfigPartial.value || '',
         moduleIndex: nodeConfigPartial.moduleIndex || '',
@@ -348,10 +348,10 @@ export function getMmpValue(mmpAddress: string,
     stringEncoding: string | undefined,
     done: (err?: any, value?: any) => void) {
 
-    ClientTestUtil.sharedApiClient.getMmpValues('local', mmpAddress, dataType, length || 1, stringEncoding)
+    ClientTestUtil.sharedApiClient!.getMmpValues('local', mmpAddress, dataType, length || 1, stringEncoding)
         .then((fulfilledResponse: { response: http.IncomingMessage; body: ApiLib.MmpNumericValues }) => {
 
-            done(undefined, fulfilledResponse.body.mmpValues[0]);
+            done(undefined, fulfilledResponse.body.mmpValues![0]);
         }, done);
 }
 
@@ -362,7 +362,7 @@ export function setMmpValue(mmpAddress: string, value: number | string,
 
     async.series([
         (next: (err?: Error, data?: any) => void) => {
-            var body = {
+            var body: any = {
                 value: value,
                 type: valueType
             };
@@ -370,7 +370,7 @@ export function setMmpValue(mmpAddress: string, value: number | string,
             if (stringEncoding)
                 body['encoding'] = stringEncoding;
 
-            ClientTestUtil.sharedApiClient.setMmpValue('local', mmpAddress, <any>body)
+            ClientTestUtil.sharedApiClient!.setMmpValue('local', mmpAddress, <any>body)
                 .then(() => { next(); }, next);
         },
         // Slight delay
@@ -382,7 +382,7 @@ export function setMmpValue(mmpAddress: string, value: number | string,
 
 export function getAnalogInput(outModuleIndex: number, channelIndex: number,
     done: (err: any, value?: number, fullModel?: ApiLib.AnalogChannelRead) => void) {
-    ClientTestUtil.sharedApiClient.getChannelAnalogStatus('local', outModuleIndex, channelIndex)
+    ClientTestUtil.sharedApiClient!.getChannelAnalogStatus('local', outModuleIndex, channelIndex)
         .then(
             (fulfilledResponse: { response: http.IncomingMessage; body: ApiLib.AnalogChannelRead }) => {
                 done(undefined, fulfilledResponse.body.value, fulfilledResponse.body);
@@ -393,7 +393,7 @@ export function getAnalogInput(outModuleIndex: number, channelIndex: number,
 
 export function getDigitalInput(outModuleIndex: number, channelIndex: number,
     done: (err: any, status?: ApiLib.DigitalChannelRead) => void) {
-    ClientTestUtil.sharedApiClient.getChannelDigitalStatus('local', outModuleIndex, channelIndex)
+    ClientTestUtil.sharedApiClient!.getChannelDigitalStatus('local', outModuleIndex, channelIndex)
         .then(
             (fulfilledResponse: { response: http.IncomingMessage; body: ApiLib.DigitalChannelRead }) => {
                 done(undefined, fulfilledResponse.body);
@@ -407,7 +407,7 @@ export function setAnalogOutput(outModuleIndex: number, channelIndex: number, va
 
     async.series([
         (next: (err?: Error, data?: any) => void) => {
-            ClientTestUtil.sharedApiClient.setAnalogChannelValue('local', outModuleIndex, channelIndex,
+            ClientTestUtil.sharedApiClient!.setAnalogChannelValue('local', outModuleIndex, channelIndex,
                 { value: value })
                 .then(() => { next(); }, next);
         },
@@ -425,7 +425,7 @@ export function setDigitalOutput(outModuleIndex: number, channelIndex: number, s
     async.series([
         // Turn Output Off
         (next: (err?: Error, data?: any) => void) => {
-            ClientTestUtil.sharedApiClient.setDigitalChannelState('local', outModuleIndex, channelIndex,
+            ClientTestUtil.sharedApiClient!.setDigitalChannelState('local', outModuleIndex, channelIndex,
                 { value: state })
                 .then(() => { next(); }, next);
         },
@@ -443,7 +443,7 @@ export function clearDigital(moduleIndex: number, channelIndex: number, clearOnL
         // Clear On-Latch
         (next: (err?: Error, data?: any) => void) => {
             if (clearOnLatch)
-                ClientTestUtil.sharedApiClient.clearDigitalChannelOnLatch('local', moduleIndex, channelIndex)
+                ClientTestUtil.sharedApiClient!.clearDigitalChannelOnLatch('local', moduleIndex, channelIndex)
                     .then(() => { next(); }, next);
             else
                 process.nextTick(next);
@@ -451,7 +451,7 @@ export function clearDigital(moduleIndex: number, channelIndex: number, clearOnL
         // Clear Off-Latch
         (next: (err?: Error, data?: any) => void) => {
             if (clearOffLatch)
-                ClientTestUtil.sharedApiClient.clearDigitalChannelOffLatch('local', moduleIndex, channelIndex)
+                ClientTestUtil.sharedApiClient!.clearDigitalChannelOffLatch('local', moduleIndex, channelIndex)
                     .then(() => { next(); }, next);
             else
                 process.nextTick(next);
@@ -459,7 +459,7 @@ export function clearDigital(moduleIndex: number, channelIndex: number, clearOnL
         // Clear Counter
         (next: (err?: Error, data?: any) => void) => {
             if (clearFeatureValue)
-                ClientTestUtil.sharedApiClient.clearDigitalChannelFeature('local', moduleIndex, channelIndex)
+                ClientTestUtil.sharedApiClient!.clearDigitalChannelFeature('local', moduleIndex, channelIndex)
                     .then(() => { next(); }, next);
             else
                 process.nextTick(next);
@@ -473,7 +473,7 @@ export function resetDigitalChannelPair(inModuleIndex: number, outModuleIndex: n
     async.series([
         // Turn Output Off
         (next: (err?: Error, data?: any) => void) => {
-            ClientTestUtil.sharedApiClient.setDigitalChannelState('local', outModuleIndex, channelIndex,
+            ClientTestUtil.sharedApiClient!.setDigitalChannelState('local', outModuleIndex, channelIndex,
                 { value: false })
                 .then(() => { next(); }, next);
         },
@@ -494,7 +494,7 @@ export function resetAnalogChannelPair(inModuleIndex: number, outModuleIndex: nu
     async.series([
         // Turn Output Off
         (next: (err?: Error, data?: any) => void) => {
-            ClientTestUtil.sharedApiClient.setAnalogChannelValue('local', outModuleIndex, channelIndex,
+            ClientTestUtil.sharedApiClient!.setAnalogChannelValue('local', outModuleIndex, channelIndex,
                 { value: 0.0 })
                 .then(() => { next(); }, next);
         },
@@ -504,12 +504,12 @@ export function resetAnalogChannelPair(inModuleIndex: number, outModuleIndex: nu
         },
         // Clear Min Values
         (next: (err?: Error, data?: any) => void) => {
-            ClientTestUtil.sharedApiClient.clearAnalogChannelMinValue('local', inModuleIndex, channelIndex)
+            ClientTestUtil.sharedApiClient!.clearAnalogChannelMinValue('local', inModuleIndex, channelIndex)
                 .then(() => { next(); }, next);
         },
         // Clear Max Values
         (next: (err?: Error, data?: any) => void) => {
-            ClientTestUtil.sharedApiClient.clearAnalogChannelMaxValue('local', inModuleIndex, channelIndex)
+            ClientTestUtil.sharedApiClient!.clearAnalogChannelMaxValue('local', inModuleIndex, channelIndex)
                 .then(() => { next(); }, next);
         },
     ], done);
