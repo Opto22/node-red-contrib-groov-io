@@ -49,7 +49,7 @@
     "sinon": "21.0.1",
     "typescript": "4.9.5",
     "typescript-formatter": "7.2.2",
-    "node-red": "1.0.2",
+    "node-red": "3.1.15",
     "swagger-typescript-codegen": "1.9.3",
     "js-yaml": "4.1.1"
   },
