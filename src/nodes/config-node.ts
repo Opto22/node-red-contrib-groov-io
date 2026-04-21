@@ -25,7 +25,7 @@ import https = require('https');
 import fs = require('fs');
 import path = require('path');
 import events = require('events');
-import request = require('request');
+import request = require('postman-request');
 import { DefaultApi } from "../swagger/lib/api";
 
 var RED: NodeRed.RED;

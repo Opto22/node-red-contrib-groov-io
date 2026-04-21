@@ -10,7 +10,7 @@
  * Do not edit the class manually.
  */
 
-import localVarRequest = require('request');
+import localVarRequest = require('postman-request');
 import http = require('http');
 import https = require('https');
 

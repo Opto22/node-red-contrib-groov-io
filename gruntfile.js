@@ -5,6 +5,7 @@ module.exports = function(grunt) {
         files: [{
           src: [
             "src/**/*.ts",
+            "submodules/opto22-node-red-common/src/**/*.ts",
             "node_modules/@opto22/node-red-utils/typings/*.d.ts"],
           dest: "build"
         }],
@@ -79,6 +80,7 @@ module.exports = function(grunt) {
           {src: 'package.json',           dest: 'package/'},
           {src: 'build/src/*.html',       dest: 'package/'},
           {src: 'build/src/**/*.js',      dest: 'package/'},
+          {src: 'build/submodules/opto22-node-red-common/src/**/*.js',      dest: 'package/'},
           {src: 'build/src/icons/*.png',  dest: 'package/build/src/icons/', flatten: true, expand:  true},
           {src: 'README.md',              dest: 'package/'},
           {src: 'LICENSE',                dest: 'package/'}
